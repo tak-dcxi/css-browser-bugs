@@ -1,0 +1,17 @@
+{
+  "name": "css-browser-bugs",
+  "private": true,
+  "type": "module",
+  "license": "CC0-1.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "index": "node scripts/build-index.mjs",
+    "versions": "node scripts/browser-versions.mjs",
+    "status": "node scripts/bug-status.mjs"
+  },
+  "cssBugs": {
+    "pagesBase": "https://tak-dcxi.github.io/css-browser-bugs/"
+  }
+}
