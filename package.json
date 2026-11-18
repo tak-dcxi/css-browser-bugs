@@ -9,7 +9,8 @@
   "scripts": {
     "index": "node scripts/build-index.mjs",
     "versions": "node scripts/browser-versions.mjs",
-    "status": "node scripts/bug-status.mjs"
+    "status": "node scripts/bug-status.mjs",
+    "hooks": "chmod +x .githooks/pre-commit && git config core.hooksPath .githooks"
   },
   "cssBugs": {
     "pagesBase": "https://tak-dcxi.github.io/css-browser-bugs/"

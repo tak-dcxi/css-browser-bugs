@@ -28,7 +28,10 @@ bugs/<slug>/
   report.<engine>.en.md   報告文の下書き（英語）。新しく報告するときだけ作る
 templates/                上の3つの雛形（scripts/new-bug.mjs と scripts/new-report.mjs が埋める）
 scripts/                  検索、バージョンの取得、一覧の生成に使うスクリプト（Node.js、依存なし）
+.githooks/pre-commit      コミットする行に、ローカルの絶対パスやメールアドレスがないかを確かめるフック
 ```
+
+複製したら、`npm run hooks` を1回実行してフックを有効にします。
 
 テストケースは GitHub Pages で公開し、報告文からその URL を示します。
 
