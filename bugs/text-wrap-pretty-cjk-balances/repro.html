@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>text-wrap-style: pretty on Japanese text</title>
+<!--
+  Testcase for text-wrap-pretty-cjk-balances. Released under CC0 1.0.
+  Self-contained: no external resources.
+
+  Japanese text can break between almost any two characters, so with
+  text-wrap-style: auto every line except the last one fills the box.
+  The box has a dashed border so that the space left at the end of each
+  line is visible.
+
+  Case 1: with auto, the last line is also full, so there is no short
+  last line to avoid. pretty is expected to look like auto. The bug: pretty
+  leaves space at the end of every line and adds one more line.
+
+  Case 2: with auto, the last line is about half full. pretty may move a
+  few characters to the last line, but it is not expected to shorten
+  every line. The bug: pretty breaks exactly like balance.
+
+  The script under each box counts the characters on each line, so that
+  the result does not depend on how wide the glyphs of the system font are.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  .count {
+    margin: 0.25rem 0 0;
+    font: 13px/1.4 ui-monospace, monospace;
+  }
+
+  /* Testcase styles */
+  .box {
+    margin: 0;
+    outline: 1px dashed gray;
+  }
+
+  .case-1 .box {
+    inline-size: 16em;
+  }
+
+  .case-2 .box {
+    inline-size: 28em;
+  }
+
+  .auto {
+    text-wrap-style: auto;
+  }
+
+  .pretty {
+    text-wrap-style: pretty;
+  }
+
+  .balance {
+    text-wrap-style: balance;
+  }
+</style>
+</head>
+<body>
+<h1>text-wrap-style: pretty on Japanese text</h1>
+
+<p>Pass if each “Test (pretty)” box looks like the “Reference (auto)” box next to it, apart from a few characters moved to the last line. Fail if it looks like the “balance” box.</p>
+<p id="support"></p>
+
+<section class="case case-1">
+  <h2>Case 1: the last line is full with auto</h2>
+  <div class="row">
+    <div>
+      <p class="label">Test (pretty)</p>
+      <p class="box pretty" lang="ja">ウェブページの本文では、段落の幅に合わせて文字が並び、行の終わりに来ると次の行に送られます。和文はほとんどの文字の間で改行できるので、行の末尾はふつう箱の右端に揃います。句読点や括弧には行頭や行末に置けない決まりがあり、ブラウザはその決まりに従って改行の位置を調整します。</p>
+    </div>
+    <div>
+      <p class="label">Reference (auto)</p>
+      <p class="box auto" lang="ja">ウェブページの本文では、段落の幅に合わせて文字が並び、行の終わりに来ると次の行に送られます。和文はほとんどの文字の間で改行できるので、行の末尾はふつう箱の右端に揃います。句読点や括弧には行頭や行末に置けない決まりがあり、ブラウザはその決まりに従って改行の位置を調整します。</p>
+    </div>
+    <div>
+      <p class="label">balance (for comparison)</p>
+      <p class="box balance" lang="ja">ウェブページの本文では、段落の幅に合わせて文字が並び、行の終わりに来ると次の行に送られます。和文はほとんどの文字の間で改行できるので、行の末尾はふつう箱の右端に揃います。句読点や括弧には行頭や行末に置けない決まりがあり、ブラウザはその決まりに従って改行の位置を調整します。</p>
+    </div>
+  </div>
+</section>
+
+<section class="case case-2">
+  <h2>Case 2: the last line is about half full with auto</h2>
+  <div class="row">
+    <div>
+      <p class="label">Test (pretty)</p>
+      <p class="box pretty" lang="ja">ウェブページの本文では、段落の幅に合わせて文字が並び、行の終わりに来ると次の行に送られます。和文はほとんどの文字の間で改行できるので、行の末尾はふつう箱の右端に揃います。句読点や括弧には行頭や行末に置けない決まりがあり、ブラウザはその決まりに従って改行の位置を調整します。</p>
+    </div>
+    <div>
+      <p class="label">Reference (auto)</p>
+      <p class="box auto" lang="ja">ウェブページの本文では、段落の幅に合わせて文字が並び、行の終わりに来ると次の行に送られます。和文はほとんどの文字の間で改行できるので、行の末尾はふつう箱の右端に揃います。句読点や括弧には行頭や行末に置けない決まりがあり、ブラウザはその決まりに従って改行の位置を調整します。</p>
+    </div>
+    <div>
+      <p class="label">balance (for comparison)</p>
+      <p class="box balance" lang="ja">ウェブページの本文では、段落の幅に合わせて文字が並び、行の終わりに来ると次の行に送られます。和文はほとんどの文字の間で改行できるので、行の末尾はふつう箱の右端に揃います。句読点や括弧には行頭や行末に置けない決まりがあり、ブラウザはその決まりに従って改行の位置を調整します。</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.getElementById('support').textContent =
+    'CSS.supports("text-wrap-style", "pretty"): ' + CSS.supports('text-wrap-style', 'pretty');
+
+  // Count the characters on each line by grouping the character boxes by their top edge.
+  function lineLengths(element) {
+    const text = element.firstChild;
+    const lengths = [];
+    let top = null;
+    for (let i = 0; i < text.length; i++) {
+      const range = document.createRange();
+      range.setStart(text, i);
+      range.setEnd(text, i + 1);
+      const rect = range.getClientRects()[0];
+      if (!rect) continue;
+      if (top === null || Math.abs(rect.top - top) > rect.height / 2) {
+        lengths.push(0);
+        top = rect.top;
+      }
+      lengths[lengths.length - 1]++;
+    }
+    return lengths;
+  }
+
+  for (const box of document.querySelectorAll('.box')) {
+    const lengths = lineLengths(box);
+    const count = document.createElement('p');
+    count.className = 'count';
+    count.textContent = lengths.length + ' lines: ' + lengths.join(', ');
+    box.after(count);
+  }
+</script>
+</body>
+</html>
