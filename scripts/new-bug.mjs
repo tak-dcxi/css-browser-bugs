@@ -7,7 +7,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { BUGS_DIR, today } from './lib/bugs.mjs';
+import { BUGS_DIR, today, yamlScalar } from './lib/bugs.mjs';
 import { pagesBase, fillTemplate } from './lib/template.mjs';
 
 const [slug, title] = process.argv.slice(2);
@@ -22,7 +22,7 @@ if (existsSync(dir)) {
   process.exit(1);
 }
 
-const values = { slug, title, date: today(), pagesBase: await pagesBase() };
+const values = { slug, title, titleYaml: yamlScalar(title), date: today(), pagesBase: await pagesBase() };
 await mkdir(dir, { recursive: true });
 for (const name of ['README.md', 'repro.html']) {
   await writeFile(path.join(dir, name), await fillTemplate(name, values));

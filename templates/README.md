@@ -1,12 +1,12 @@
 ---
-title: {{title}}
+title: {{titleYaml}}
 slug: {{slug}}
 created: {{date}}
 updated: {{date}}
 features:
-status.webkit: -
-status.gecko: -
-status.blink: -
+status.webkit: "-"
+status.gecko: "-"
+status.blink: "-"
 links.webkit:
 links.gecko:
 links.blink:

@@ -3,7 +3,7 @@ title: style 要素の @scope で、暗黙の範囲の起点の a に :any-link:
 slug: scope-implicit-root-any-link-hover
 created: 2026-11-18
 updated: 2026-11-18
-features: @scope, :scope, CSS Nesting, :any-link, :hover
+features: "@scope, :scope, CSS Nesting, :any-link, :hover"
 status.webkit: cannot-reproduce
 status.gecko: not-affected
 status.blink: not-affected
