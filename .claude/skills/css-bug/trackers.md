@@ -33,9 +33,10 @@ node scripts/search-bugzilla.mjs mozilla "text-decoration-inset animation" "text
 https://issues.chromium.org/issues?q=<検索語>
 ```
 
-- 結果はページを開いたあとに読み込まれる。`get_page_text` の結果が「Searching for」のままなら、数秒待って読み直す。結果の見出しの「1 - N of M」が件数になる。
+- 結果はページを開いたあとに読み込まれる。`get_page_text` の結果が「Searching for」のままなら、5秒待って読み直す。3回読み直しても変わらなければ、読めなかった検索として扱う。結果の見出しの「1 - N of M」の M が件数になる。
 - 状態で絞り込まない検索では、閉じた件（Fixed、Duplicate、Obsolete など）も結果に出る。`status:open` のような条件を付けない。
-- 本文も検索の対象になるので、関係のない件が多く出る。題を読んで関係しそうな件だけを開く。件の URL は `https://issues.chromium.org/issues/<ID>`。
+- 語だけの検索は本文も対象にするので、WPT の取り込みの失敗を記録した件のような、関係のない件が100件以上出ることがある。まず `title:text-decoration-inset` のように `title:` を付けて題だけを検索し、語だけの検索も1つ以上行う。件の URL は `https://issues.chromium.org/issues/<ID>`。
+- 一覧には Component が出ない。Component は件を開いて確かめる。
 - 検索にサインインは要らない。サインインを求められたら、ユーザーに組み込みブラウザでサインインしてもらう。
 - 報告先: https://issues.chromium.org/issues/new 。Component は、似た件が使っているもの（`Blink>CSS`、`Blink>Layout>Inline`、`Blink>Animation` など）から選ぶ。
 

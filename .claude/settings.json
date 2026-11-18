@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node scripts/search-bugzilla.mjs *)",
+      "Bash(node scripts/search-wpt.mjs *)",
+      "Bash(node scripts/browser-versions.mjs)",
+      "Bash(node scripts/bug-status.mjs)",
+      "Bash(node scripts/bug-status.mjs *)",
+      "Bash(node scripts/build-index.mjs)",
+      "Bash(npm run index)",
+      "Bash(npm run versions)",
+      "Bash(npm run status)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log)",
+      "Bash(git log *)",
+      "Bash(git show *)"
+    ],
+    "deny": [
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(git commit --no-verify*)",
+      "Bash(git commit * --no-verify*)",
+      "Bash(git commit -n *)",
+      "Bash(git reset --hard*)"
+    ]
+  }
+}
