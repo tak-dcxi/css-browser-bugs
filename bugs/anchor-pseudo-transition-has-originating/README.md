@@ -4,10 +4,10 @@ slug: anchor-pseudo-transition-has-originating
 created: 2026-11-18
 updated: 2026-11-18
 features: CSS Anchor Positioning, anchor(), CSS Transitions, :has(), ::after
-status.webkit: drafted
+status.webkit: reported
 status.gecko: unsupported
 status.blink: not-affected
-links.webkit:
+links.webkit: https://bugs.webkit.org/show_bug.cgi?id=332060
 links.gecko:
 links.blink:
 links.spec: https://drafts.csswg.org/css-anchor-position-1/#anchor-pos
@@ -133,6 +133,6 @@ Blink は期待どおりに動いたので、トラッカーは検索してい�
 
 ## 結論
 
-- WebKit: `drafted`。Safari 26.5 と Safari Technology Preview 27.0 で、`anchor()` で配置した `::after` の元の要素に `:has()` の規則が当たっていると、アンカーが変わっても `left` のトランジションが始まらない。`:has()` の中身は `:hover`（H2）でもクラス（グループ2）でもよく、宣言の値が変わらなくても起きる。`:has()` を親に書く（グループ3、H4）、本物の子要素を配置する（グループ4、H5）、元の要素に `:hover` を書く（H3）、アンカーを使わない（グループ5）のいずれかで起きなくなる。仕様は §3.2 で、`anchor()` が計算値の時点で解決されるのでトランジションが始まると決めている。同じ条件の既存の報告は見つからなかった。近い件の [314641](https://bugs.webkit.org/show_bug.cgi?id=314641) は、報告文で関連として示す。
+- WebKit: `reported`。2026-11-18 に [WebKit Bug 332060](https://bugs.webkit.org/show_bug.cgi?id=332060) として報告した。Safari 26.5 と Safari Technology Preview 27.0 で、`anchor()` で配置した `::after` の元の要素に `:has()` の規則が当たっていると、アンカーが変わっても `left` のトランジションが始まらない。`:has()` の中身は `:hover`（H2）でもクラス（グループ2）でもよく、宣言の値が変わらなくても起きる。`:has()` を親に書く（グループ3、H4）、本物の子要素を配置する（グループ4、H5）、元の要素に `:hover` を書く（H3）、アンカーを使わない（グループ5）のいずれかで起きなくなる。仕様は §3.2 で、`anchor()` が計算値の時点で解決されるのでトランジションが始まると決めている。同じ条件の既存の報告は見つからなかった。近い件の [314641](https://bugs.webkit.org/show_bug.cgi?id=314641) は、報告文で関連として示す。
 - Gecko: `unsupported`。Firefox 160.0.1 と Nightly 162.0a1 は、`:has()` の有無によらず `anchor()` の値がトランジションしない（グループ1も失敗する）。`anchor()` の値のトランジションが未実装で、[Bug 1924226](https://bugzilla.mozilla.org/show_bug.cgi?id=1924226) が扱っている。今回の条件に固有の問題があるかは、1924226 が直るまで確かめられない。
 - Blink: `not-affected`。Chrome 157 と Canary 160 は、すべてのグループでトランジションが始まる。
