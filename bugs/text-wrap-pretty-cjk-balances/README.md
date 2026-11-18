@@ -1,5 +1,5 @@
 ---
-title: 和文の text-wrap: pretty が、balance のように各行を短く揃えて折り返す
+title: "和文の text-wrap: pretty が、balance のように各行を短く揃えて折り返す"
 slug: text-wrap-pretty-cjk-balances
 created: 2026-11-18
 updated: 2026-11-18

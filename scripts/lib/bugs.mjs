@@ -1,5 +1,6 @@
 // Shared helpers: repository paths, frontmatter parsing, and the status vocabulary.
 // Frontmatter is flat `key: value` lines so it can be parsed without a YAML library.
+// It must still be valid YAML for GitHub, so values that need it are double-quoted.
 
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -25,17 +26,57 @@ export const STATUSES = [
   'fixed',
 ];
 
-export function parseFrontmatter(text) {
+// Returns [key, raw value] pairs, or null when there is no frontmatter.
+function frontmatterEntries(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) return null;
-  const data = {};
+  const entries = [];
   for (const line of match[1].split(/\r?\n/)) {
     if (!line.trim() || line.trimStart().startsWith('#')) continue;
     const colon = line.indexOf(':');
     if (colon < 0) continue;
-    data[line.slice(0, colon).trim()] = line.slice(colon + 1).trim();
+    entries.push([line.slice(0, colon).trim(), line.slice(colon + 1).trim()]);
   }
-  return data;
+  return entries;
+}
+
+// GitHub renders the frontmatter as YAML and shows an error instead of the table when it
+// does not parse. A plain value breaks YAML when it starts with an indicator character
+// (`@`, `-`, `:`, quotes, ...), contains `: ` or ` #`, or ends with `:`.
+export function needsQuotes(value) {
+  return value !== '' && (/^[-?:,[\]{}#&*!|>'"%@`]/.test(value) || /: | #|:$/.test(value));
+}
+
+// Double-quoted JSON strings are valid YAML double-quoted scalars.
+export function yamlScalar(value) {
+  return needsQuotes(value) ? JSON.stringify(value) : value;
+}
+
+function unquote(raw) {
+  if (raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"')) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw.slice(1, -1);
+    }
+  }
+  if (raw.length >= 2 && raw.startsWith("'") && raw.endsWith("'")) {
+    return raw.slice(1, -1).replaceAll("''", "'");
+  }
+  return raw;
+}
+
+export function parseFrontmatter(text) {
+  const entries = frontmatterEntries(text);
+  if (!entries) return null;
+  return Object.fromEntries(entries.map(([key, raw]) => [key, unquote(raw)]));
+}
+
+// Keys whose value is written unquoted but needs quotes to be valid YAML.
+export function unquotedUnsafeKeys(text) {
+  return (frontmatterEntries(text) ?? [])
+    .filter(([, raw]) => unquote(raw) === raw && needsQuotes(raw))
+    .map(([key]) => key);
 }
 
 export function splitLinks(value) {
@@ -63,6 +104,9 @@ export async function loadBugs() {
     if (!data) {
       console.warn(`warning: no frontmatter in bugs/${entry.name}/README.md`);
       continue;
+    }
+    for (const key of unquotedUnsafeKeys(text)) {
+      console.warn(`warning: bugs/${entry.name}/README.md: quote the value of ${key} with "..." (it is not valid YAML as is)`);
     }
     bugs.push({ dir: entry.name, file, data });
   }
