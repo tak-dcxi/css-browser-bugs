@@ -70,3 +70,41 @@ https://wpt.fyi/results/?q=<テスト名の一部>
 - Environment には、確かめたブラウザのバージョンと OS を書く。変えた設定があれば書く。
 - Other browsers には、ほかのエンジンでの結果を書く。
 - Web Platform Tests には、関係するテストと、その結果を書く。
+
+## 送信の準備
+
+[SKILL.md](SKILL.md) の「送信の準備」で使う。
+
+### 欄の表（WebKit Bugzilla と Mozilla Bugzilla）
+
+| 欄 | 値の決め方 |
+|---|---|
+| Product / Component | 下書きの冒頭のコメントの値 |
+| Version | REST で取った有効な値から、確かめた安定版に合うもの（例: `Safari 27`） |
+| Hardware | REST で取った値から、`uname -m` に合うもの（`arm64` なら `Mac (Apple Silicon)`） |
+| OS | REST で取った値から、「確認した環境」の OS に合うもの |
+| URL | テストケースの公開 URL。開けないときは空欄 |
+| See Also | 下書きで関連として示した件の URL |
+| Attachment | `bugs/<slug>/repro.html`（Content Type は HTML） |
+| Keywords | 空欄（WebKit の `InRadar` は Apple 側が付ける） |
+| Severity / Priority | 既定のまま |
+
+今選べる値は、組み込みブラウザでトラッカーのページを開き、同じオリジンから REST を読んで取る。
+
+```js
+// bugs.webkit.org の例。bugzilla.mozilla.org も同じ API で、product は Core
+const p = await (await fetch('/rest/product?names=WebKit&include_fields=versions.name,versions.is_active,components.name,components.is_active')).json();
+const hw = await (await fetch('/rest/field/bug/rep_platform')).json();
+const os = await (await fetch('/rest/field/bug/op_sys')).json();
+```
+
+Version は年ごとに増え、古い値は無効になる。前回の報告の値を使い回さず、毎回取る。
+
+### 本文の整え方
+
+- Bugzilla の本文は Markdown として表示されない。見出しの `#` と、コードを囲むバッククォートを外す。リンクは URL をそのまま書く。
+- 下書きの1行目の題は Summary の欄に入れ、Description には入れない。冒頭のコメント（`<!-- ... -->`）も入れない。
+- それ以外の文は下書きのまま使い、言い換えない。下書きを直したいときは、先にファイルを直してコミットする。
+- 公開 URL が開けないときは、Steps to reproduce の「(also available at …)」を外す。
+
+Chromium Issue Tracker で本文の書式がどう表示されるかは確かめていない。初めて報告するときにフォームのプレビューで確かめ、結果をこの節に書き足す。

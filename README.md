@@ -58,7 +58,7 @@ scripts/                  検索、バージョンの取得、一覧の生成に
 |---|---|---|---|---|
 | [アンカーで配置した ::after のトランジションが、元の要素に :has() の規則が当たると始まらない](bugs/anchor-pseudo-transition-has-originating/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332060) | unsupported | not-affected | 2026-11-18 |
 | [style 要素の @scope で、暗黙の範囲の起点の a に :any-link:hover が当たらない](bugs/scope-implicit-root-any-link-hover/) | cannot-reproduce | not-affected | not-affected | 2026-11-18 |
-| [和文の text-wrap: pretty が、balance のように各行を短く揃えて折り返す](bugs/text-wrap-pretty-cjk-balances/) | drafted | unsupported | not-affected | 2026-11-18 |
+| [和文の text-wrap: pretty が、balance のように各行を短く揃えて折り返す](bugs/text-wrap-pretty-cjk-balances/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332074) | unsupported | not-affected | 2026-11-18 |
 <!-- index:end -->
 
 ## ライセンス
