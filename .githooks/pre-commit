@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 const PATTERNS = [
-  { label: 'absolute path', re: /(?<![\w.])\/(?:Users|home)\/[A-Za-z0-9._-]+\//g },
+  { label: 'absolute path', re: /(?<![\w.])\/(?:Users|home)\/[A-Za-z0-9._-]+/g },
   { label: 'absolute path', re: /\b[A-Za-z]:\\Users\\[A-Za-z0-9._-]+/g },
   { label: 'email address', re: /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g },
 ];

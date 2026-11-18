@@ -45,7 +45,7 @@ argument-hint: "<バグの説明> | status | submit <slug> <engine> | reported <
 8. **状態**: エンジンごとの `status.*` を決め、根拠を「結論」に書く。既存の報告があれば `links.*` にその URL を、仕様の節を `links.spec` に書き、`updated` を今日の日付にする。
    完了: frontmatter のすべての `status.*` が `-` 以外になり、「結論」がその理由を説明している。
 9. **下書き**: `drafted` にしたエンジンごとに、`node scripts/new-report.mjs <slug> <engine>` で `bugs/<slug>/report.<engine>.en.md` を作り、英語で埋める。報告先と欄の値は trackers.md の手順で決める。
-   埋めたら reviewer に、slug とエンジンだけを渡して確かめさせる。調査の経緯や、迷った点は渡さない。`changes` が返ったら指摘を直し、前回の判定を添えてもう一度渡す。2回直しても `approve` にならなければ止め、reviewer の指摘と自分の考えを並べてユーザーに見せる。提案（英語の直し案）を取り入れるかは自分で決める。
+   埋めたら reviewer に、slug とエンジンだけを渡して確かめさせる。調査の経緯や、迷った点は渡さない。`changes` が返ったら指摘を直し、前回の判定を添えてもう一度渡す。2回直しても `approve` にならなければ止め、reviewer の指摘と自分の考えを並べてユーザーに見せる。提案（英語の直し案）を取り入れるかは自分で決める。Fable の利用の上限に達して reviewer を呼べないときは、呼び出しに `model: opus` を渡す（effort は xhigh）。
    完了: 冒頭のコメントの欄がすべて埋まり、本文の各節に内容があり、reviewer が `approve` を返した。
 10. **コミット**: `node scripts/build-index.mjs` で一覧を作り直す。「公開前の点検」を行ってからコミットする。push はしない。
     完了: コミットができ、`git status` に変更が残っていない。
