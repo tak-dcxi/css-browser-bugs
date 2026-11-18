@@ -54,7 +54,9 @@ scripts/                  検索、バージョンの取得、一覧の生成に
 `node scripts/build-index.mjs` で、各件の frontmatter から作り直します。
 
 <!-- index:start -->
-まだありません。
+| 件 | WebKit | Gecko | Blink | 更新 |
+|---|---|---|---|---|
+| [アンカーで配置した ::after のトランジションが、元の要素に :has() の規則が当たると始まらない](bugs/anchor-pseudo-transition-has-originating/) | drafted | unsupported | not-affected | 2026-11-18 |
 <!-- index:end -->
 
 ## ライセンス

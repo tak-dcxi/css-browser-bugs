@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transition of an anchor-positioned ::after when :has() matches its originating element</title>
+<!--
+  Testcase for anchor-pseudo-transition-has-originating. Released under CC0 1.0.
+  Self-contained: no external resources.
+
+  Each list has three links of the same width. A highlight is positioned
+  with left: anchor(left) on the link with anchor-name. After the page
+  loads, the script moves the anchor-name from the first link to the third
+  link. The anchor() value resolves at computed-value time, so its
+  computed value changes and a transition of `left` must start.
+
+  The transition has a very long duration and a negative delay of half the
+  duration, so it starts at its midpoint and stays there. If the
+  transition starts, the highlight is over the second link ("Two"). If it
+  does not start, the highlight jumps to the third link ("Three").
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  #results {
+    font: 13px/1.4 ui-monospace, monospace;
+  }
+
+  /* Testcase styles */
+  .list {
+    position: relative;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .list a,
+  .reference span {
+    display: block;
+    inline-size: 6rem;
+    padding-block: 0.5rem;
+    color: inherit;
+    text-align: center;
+  }
+
+  .list::after,
+  .marker {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: anchor(left);
+    inline-size: 6rem;
+    background: rgb(0 128 255 / 0.3);
+    /* Keep the highlight from taking :hover away from the links under it. */
+    pointer-events: none;
+  }
+
+  .frozen::after,
+  .frozen .marker {
+    transition: left 10000s linear -5000s;
+  }
+
+  #a1 .current { anchor-name: --a1; }
+  #a1::after   { position-anchor: --a1; }
+
+  #a2 .current { anchor-name: --a2; }
+  #a2::after   { position-anchor: --a2; }
+  #a2:has(a.current) { --flag: on; }
+
+  #a3 .current { anchor-name: --a3; }
+  #a3::after   { position-anchor: --a3; }
+  #wrap3:has(a.current) { --flag: on; }
+
+  #a4 .current { anchor-name: --a4; }
+  #a4::after   { content: none; }
+  #a4 .marker  { position-anchor: --a4; }
+  #a4:has(a.current) { --flag: on; }
+
+  /* Group 5: no anchor positioning. left changes with a class on the list. */
+  #a5::after       { left: 0; }
+  #a5.moved::after { left: 12rem; }
+  #a5:has(a.current) { --flag: on; }
+
+  .reference {
+    position: relative;
+    display: flex;
+  }
+
+  .reference::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: 6rem;
+    inline-size: 6rem;
+    background: rgb(0 128 255 / 0.3);
+  }
+
+  /* Manual checks with :hover */
+  .hover::after {
+    transition: left 1s linear;
+  }
+
+  #h1 a:hover { anchor-name: --h1; }
+  #h1::after  { position-anchor: --h1; left: anchor(left, 0px); }
+
+  #h2 a:hover { anchor-name: --h2; }
+  #h2::after  { position-anchor: --h2; left: anchor(left, 0px); }
+  #h2:has(a:hover) { --flag: on; }
+
+  #h3 a:hover { anchor-name: --h3; }
+  #h3::after  { position-anchor: --h3; left: anchor(left, 0px); }
+  #h3:hover   { --flag: on; }
+
+  #h4 a:hover { anchor-name: --h4; }
+  #h4::after  { position-anchor: --h4; left: anchor(left, 0px); }
+  #wrap-h4:has(a:hover) { --flag: on; }
+
+  #h5 a:hover  { anchor-name: --h5; }
+  #h5::after   { content: none; }
+  #h5 .marker  { position-anchor: --h5; left: anchor(left, 0px); transition: left 1s linear; }
+  #h5:has(a:hover) { --flag: on; }
+</style>
+</head>
+<body>
+<h1>Transition of an anchor-positioned ::after when :has() matches its originating element</h1>
+
+<p>Pass if, in groups 1 to 5, the highlight is over “Two”, the same as in the Reference. Fail if the highlight is over “Three”. Reload the page to run the test again.</p>
+
+<ul id="results"></ul>
+
+<section class="case">
+  <p class="label">Reference: the expected position (over “Two”)</p>
+  <div class="reference"><span>One</span><span>Two</span><span>Three</span></div>
+</section>
+
+<section class="case">
+  <p class="label">1. Control: ::after, no :has() rule</p>
+  <ul class="list frozen" id="a1">
+    <li><a href="#" class="current">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+  </ul>
+</section>
+
+<section class="case">
+  <p class="label">2. ::after, with <code>ul:has(a.current) { --flag: on; }</code> on the originating element</p>
+  <ul class="list frozen" id="a2">
+    <li><a href="#" class="current">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+  </ul>
+</section>
+
+<section class="case">
+  <p class="label">3. ::after, with the same :has() rule on the parent of the originating element</p>
+  <div id="wrap3">
+    <ul class="list frozen" id="a3">
+      <li><a href="#" class="current">One</a></li>
+      <li><a href="#">Two</a></li>
+      <li><a href="#">Three</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="case">
+  <p class="label">4. A real child element instead of ::after, with <code>ul:has(a.current) { --flag: on; }</code></p>
+  <ul class="list frozen" id="a4">
+    <li><a href="#" class="current">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+    <li class="marker" aria-hidden="true"></li>
+  </ul>
+</section>
+
+<section class="case">
+  <p class="label">5. Control without anchor positioning: ::after whose <code>left</code> changes with a class on the list, with <code>ul:has(a.current) { --flag: on; }</code></p>
+  <ul class="list frozen" id="a5">
+    <li><a href="#" class="current">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+  </ul>
+</section>
+
+<h2>Manual checks with :hover</h2>
+
+<p>Move the pointer from “One” to “Three”. Pass if the highlight slides over 1 second in all five lists. Fail if it jumps.</p>
+
+<section class="case">
+  <p class="label">H1. Control: no :has() rule</p>
+  <ul class="list hover" id="h1">
+    <li><a href="#">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+  </ul>
+</section>
+
+<section class="case">
+  <p class="label">H2. <code>ul:has(a:hover) { --flag: on; }</code> on the originating element</p>
+  <ul class="list hover" id="h2">
+    <li><a href="#">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+  </ul>
+</section>
+
+<section class="case">
+  <p class="label">H3. <code>ul:hover { --flag: on; }</code> on the originating element</p>
+  <ul class="list hover" id="h3">
+    <li><a href="#">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+  </ul>
+</section>
+
+<section class="case">
+  <p class="label">H4. <code>:has(a:hover) { --flag: on; }</code> on the parent of the originating element</p>
+  <div id="wrap-h4">
+    <ul class="list hover" id="h4">
+      <li><a href="#">One</a></li>
+      <li><a href="#">Two</a></li>
+      <li><a href="#">Three</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="case">
+  <p class="label">H5. A real child element instead of ::after, with <code>ul:has(a:hover) { --flag: on; }</code></p>
+  <ul class="list" id="h5">
+    <li><a href="#">One</a></li>
+    <li><a href="#">Two</a></li>
+    <li><a href="#">Three</a></li>
+    <li class="marker" aria-hidden="true"></li>
+  </ul>
+</section>
+
+<script>
+  const groups = ["a1", "a2", "a3", "a4", "a5"].map((id) => {
+    const list = document.getElementById(id);
+    const marker = list.querySelector(".marker");
+    return {
+      id,
+      list,
+      links: list.querySelectorAll("a"),
+      target: marker ?? list,
+      pseudo: marker ? null : "::after",
+    };
+  });
+
+  const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+  const left = (g) => getComputedStyle(g.target, g.pseudo).left;
+
+  async function run() {
+    await frame();
+    await frame();
+    const before = groups.map(left);
+
+    for (const g of groups) {
+      g.links[0].classList.remove("current");
+      g.links[2].classList.add("current");
+      if (g.id === "a5") g.list.classList.add("moved");
+    }
+
+    await frame();
+    await frame();
+
+    const results = document.getElementById("results");
+    groups.forEach((g, i) => {
+      const transitions = document.getAnimations().filter((a) =>
+        a instanceof CSSTransition &&
+        a.effect.target === g.target &&
+        (a.effect.pseudoElement ?? null) === g.pseudo);
+      const item = document.createElement("li");
+      item.textContent = `Group ${i + 1}: left ${before[i]} -> ${left(g)}, running transitions of left: ${transitions.length}`;
+      results.append(item);
+    });
+    const item = document.createElement("li");
+    item.textContent = "Expected: left 0px -> 96px, running transitions of left: 1";
+    results.append(item);
+  }
+
+  addEventListener("load", run);
+</script>
+</body>
+</html>
