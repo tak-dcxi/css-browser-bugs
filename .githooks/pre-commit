@@ -1,0 +1,64 @@
+#!/usr/bin/env node
+// Stop a commit whose added lines contain a local absolute path or an email address.
+// This repository is public, and both leak who made the change and where.
+//
+// Enable once per clone with `npm run hooks`.
+// Run by hand on any text with `node .githooks/pre-commit --stdin < file`.
+
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+
+const PATTERNS = [
+  { label: 'absolute path', re: /(?<![\w.])\/(?:Users|home)\/[A-Za-z0-9._-]+/g },
+  { label: 'absolute path', re: /\b[A-Za-z]:\\Users\\[A-Za-z0-9._-]+/g },
+  { label: 'email address', re: /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g },
+];
+// Addresses that identify no one.
+const ALLOWED = [/^git@github\.com$/, /@example\.(?:com|org|net)$/];
+
+function findings(lines) {
+  const found = [];
+  for (const { file, line, text } of lines) {
+    for (const { label, re } of PATTERNS) {
+      for (const match of text.matchAll(re)) {
+        if (label === 'email address' && ALLOWED.some((allowed) => allowed.test(match[0]))) continue;
+        found.push(`${file}:${line}: ${label}: ${match[0]}`);
+      }
+    }
+  }
+  return found;
+}
+
+// Added lines of the staged diff, with the file and the new line number of each.
+function stagedLines() {
+  const diff = execFileSync('git', ['diff', '--cached', '--no-color', '--no-ext-diff', '-U0', '--diff-filter=ACMR'], {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  const lines = [];
+  let file = '';
+  let line = 0;
+  for (const text of diff.split('\n')) {
+    if (text.startsWith('+++ ')) {
+      file = text.replace(/^\+\+\+ (?:b\/)?/, '');
+    } else if (text.startsWith('@@')) {
+      line = Number(/\+(\d+)/.exec(text)[1]);
+    } else if (text.startsWith('+')) {
+      lines.push({ file, line, text: text.slice(1) });
+      line++;
+    }
+  }
+  return lines;
+}
+
+function stdinLines() {
+  return readFileSync(0, 'utf8').split('\n').map((text, i) => ({ file: '<stdin>', line: i + 1, text }));
+}
+
+const found = findings(process.argv.includes('--stdin') ? stdinLines() : stagedLines());
+if (found.length > 0) {
+  console.error('pre-commit: the staged changes contain information that should not be public:');
+  for (const item of found) console.error(`  ${item}`);
+  console.error('Remove it (write paths relative to the repository) and stage again.');
+  process.exit(1);
+}

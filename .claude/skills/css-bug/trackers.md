@@ -33,9 +33,10 @@ node scripts/search-bugzilla.mjs mozilla "text-decoration-inset animation" "text
 https://issues.chromium.org/issues?q=<検索語>
 ```
 
-- 結果はページを開いたあとに読み込まれる。`get_page_text` の結果が「Searching for」のままなら、数秒待って読み直す。結果の見出しの「1 - N of M」が件数になる。
+- 結果はページを開いたあとに読み込まれる。`get_page_text` の結果が「Searching for」のままなら、5秒待って読み直す。3回読み直しても変わらなければ、読めなかった検索として扱う。結果の見出しの「1 - N of M」の M が件数になる。
 - 状態で絞り込まない検索では、閉じた件（Fixed、Duplicate、Obsolete など）も結果に出る。`status:open` のような条件を付けない。
-- 本文も検索の対象になるので、関係のない件が多く出る。題を読んで関係しそうな件だけを開く。件の URL は `https://issues.chromium.org/issues/<ID>`。
+- 語だけの検索は本文も対象にするので、WPT の取り込みの失敗を記録した件のような、関係のない件が100件以上出ることがある。まず `title:text-decoration-inset` のように `title:` を付けて題だけを検索し、語だけの検索も1つ以上行う。件の URL は `https://issues.chromium.org/issues/<ID>`。
+- 一覧には Component が出ない。Component は件を開いて確かめる。
 - 検索にサインインは要らない。サインインを求められたら、ユーザーに組み込みブラウザでサインインしてもらう。
 - 報告先: https://issues.chromium.org/issues/new 。Component は、似た件が使っているもの（`Blink>CSS`、`Blink>Layout>Inline`、`Blink>Animation` など）から選ぶ。
 
@@ -45,19 +46,19 @@ https://issues.chromium.org/issues?q=<検索語>
 gh search issues --repo w3c/csswg-drafts --limit 30 --json number,title,state,url -- "<検索語>"
 ```
 
-`gh search issues` は、開いている件と閉じた件を両方返す。`gh` がネットワークに接続できないときは、組み込みブラウザで `https://github.com/w3c/csswg-drafts/issues?q=is:issue+<検索語>` を開く（`state:open` を付けないので、閉じた件も出る）。仕様が決まっていない、または議論中の件が見つかったら、「期待する挙動と根拠」にその Issue を書く。報告先ではない。
+`gh search issues` は、開いている件と閉じた件を両方返す。`gh` がネットワークに接続できないときや、権限の設定で拒否されたときは、組み込みブラウザで `https://github.com/w3c/csswg-drafts/issues?q=is:issue+<検索語>` を開く（`state:open` を付けないので、閉じた件も出る）。仕様が決まっていない、または議論中の件が見つかったら、「期待する挙動と根拠」にその Issue を書く。報告先ではない。
 
 ## web-platform-tests
 
-組み込みブラウザで wpt.fyi を開き、`get_page_text` で結果を読む。
-
-```text
-https://wpt.fyi/results/css/<仕様のディレクトリ>?label=master&label=experimental&aligned
-https://wpt.fyi/results/?q=<テスト名の一部>
+```bash
+node scripts/search-wpt.mjs "text-decoration-inset" "css-text-decor/text-decoration-skip"
 ```
 
-- `<仕様のディレクトリ>` は `css-text`、`css-text-decor`、`css-anchor-position` のように、仕様の短い名前になる。
-- テストの名前、各エンジンの結果（合格したサブテストの数）、見た日付を記録する。
+- 引用符で囲んだ1つの引数が1回の検索になる。wpt.fyi は、引数をテストのパスの一部として照合する。機能の名前のほか、`css-text`、`css-text-decor`、`css-anchor-position` のような仕様のディレクトリも使える。
+- 既定では、安定版の run と先行版（Chrome Canary、Firefox Nightly、Safari Technology Preview）の run の両方を出す。`--channel stable` か `--channel experimental` で片方に絞れる。
+- 結果の `results` は、サブテストのあるテストでは「合格した数/全体の数」、ないテスト（reftest など）では `PASS`、`FAIL` のような状態になる。
+- テストの名前、各エンジンの結果、run のブラウザのバージョン、見た日付を記録する。
+- wpt.fyi の結果のページは JavaScript で描かれるので、`get_page_text` では本文を読めない。スクリプトがネットワークに接続できないときは、`--urls` で出した API の URL を WebFetch で読む。
 
 ## 報告文の書き方
 

@@ -65,7 +65,7 @@ OS: macOS 27.2.1。確認日: 2026-11-18。
 
 テストケースの2つの幅だけでは、症状が和文に固有かどうかが分からない。そこで Safari 27.2 で、幅を 10em から 30em まで 1em ずつ変え、同じ和文の段落と英文の段落の行ごとの文字数を比べた（この比較はテストケースに入れていない）。
 
-- 和文: `pretty` は、どの幅でも `auto` より各行が短い。10em では `auto` の14行が17行に増え、`balance` の14行より多い。26em から 30em では `balance` とまったく同じ改行になる。
+- 和文: `pretty` は `auto` より、最終行を除く各行が短い。最終行は、ケース2（28em）のように `auto` より長くなることがある。10em では `auto` の14行が17行に増え、`balance` の14行より多い。26em から 30em では `balance` とまったく同じ改行になる。
 - 英文: 14em から 30em の多くの幅で、`pretty` が `balance` と同じ改行になる。10em では `auto` の12行が15行に増える。
 - `lang="ja"` を外しても、和文の結果は変わらない。
 
@@ -122,5 +122,6 @@ Blink は期待どおりに動いたので、トラッカーは検索してい�
 ## 結論
 
 - WebKit: `reported`。2026-11-18 に [WebKit Bug 332074](https://bugs.webkit.org/show_bug.cgi?id=332074) として報告した。Safari 27.2 と Safari Technology Preview 27.0 で、今も再現する。和文の `text-wrap-style: pretty` が、`auto` で行末がそろう段落でも各行を短くして行を増やし（ケース1）、最終行が半分ほどの段落では `balance` と同じ改行になる（ケース2）。仕様は `pretty` の細部を UA に任せていて、行の長さのばらつきを減らすことも認めているので、`balance` に近い改行そのものは仕様に反しない。しかし和文では、`auto` の時点で行の長さがそろっている。そこから各行を短くして行を増やすことは、仕様が `pretty` に求める「よりよい組版」に当たらないと判断し、報告文を下書きした（[report.webkit.en.md](report.webkit.en.md)）。原因と見られる [288650](https://bugs.webkit.org/show_bug.cgi?id=288650) は、報告文で関連として示す。
+  同じ日に、報告文の2点を訂正するコメントを投稿した（[comment 2](https://bugs.webkit.org/show_bug.cgi?id=332074#c2)）。1点目では、幅を変えた比較の「各行が短い」を「最終行を除く各行が短い」に直した。ケース2では、最終行が16文字から28文字に伸びるためである。2点目では、仕様の言い換えを、`pretty` は組版を「よくするべき」（should）という仕様の書き方に合わせた。
 - Gecko: `unsupported`。Firefox 160.0.1 と Nightly 162.0a1 は `text-wrap-style: pretty` に未対応。実装は [Bug 1960910](https://bugzilla.mozilla.org/show_bug.cgi?id=1960910) が扱っている。
 - Blink: `not-affected`。Chrome 157 と Canary 160 は、どちらのケースでも `pretty` が `auto` と同じ改行になる。
