@@ -2,7 +2,7 @@
 name: css-bug
 description: ブラウザの CSS のバグを調べて記録し、既存の報告がなければ英語の報告文を下書きする。状態の更新と、報告した URL の記録もする。
 disable-model-invocation: true
-argument-hint: "<バグの説明> | status | reported <slug> <engine> <URL>"
+argument-hint: "<バグの説明> | status | submit <slug> <engine> | reported <slug> <engine> <URL>"
 ---
 
 # css-bug
@@ -10,6 +10,7 @@ argument-hint: "<バグの説明> | status | reported <slug> <engine> <URL>"
 `$ARGUMENTS` の最初の語で、どの手順を行うかを決める。
 
 - `status`: 「状態の更新」
+- `submit`: 「送信の準備」
 - `reported`: 「報告の記録」
 - それ以外: 「調査」。引数全体がバグの説明
 
@@ -58,13 +59,28 @@ argument-hint: "<バグの説明> | status | reported <slug> <engine> <URL>"
 2. 解決した件の状態を更新する。修正されたら `fixed` にし、直ったバージョンを「結論」に書く。重複として閉じられたら、統合先の件の URL（出力の `dupeOf`）を `links.*` に加える。あわせて `updated` を今日の日付にする。
 3. 調査の手順の 10 と同じ方法で、一覧を作り直してコミットする。
 
+## 送信の準備
+
+`submit <slug> <engine>` のときの手順。`bugs/<slug>/report.<engine>.en.md` から、ユーザーがトラッカーのフォームにそのまま貼れる欄の値と本文を作る。各欄の値の取り方と本文の整え方は、trackers.md の「送信の準備」にある。
+
+1. **公開 URL**: テストケースの公開 URL を組み込みブラウザで開き、ページが返るか確かめる。404 なら、コミットが Pages に出ていない（push、マージ、Pages の更新のどれかが済んでいない）。
+   完了: 公開 URL が開けるか、開けない理由をユーザーに伝える準備ができている。
+2. **欄の値**: トラッカーで今選べる値を取り、「確認した環境」に合う値を選ぶ。
+   完了: trackers.md の欄の表のすべての欄に値がある。
+3. **本文**: 下書きから、トラッカーの表示に合わせた Summary と Description を作る。下書きのファイルは変えない。
+   完了: Summary と Description が、それぞれ1つのコードブロックで貼れる形になっている。
+4. **提示**: フォームの URL、欄の表、Summary、Description を示す。添付するファイルを明記する。公開 URL が開けないときは、URL 欄を空にし、本文から公開 URL を外した Description を示して、理由を添える。
+
+送信したら `reported` で記録するよう、最後に案内する。
+
 ## 報告の記録
 
 `reported <slug> <engine> <URL>` のときの手順。`<engine>` は `webkit`、`gecko`、`blink` のどれか。
 
 1. `bugs/<slug>/README.md` の `status.<engine>` を `reported` にし、`links.<engine>` に URL を加え、`updated` を今日の日付にする。
 2. 「結論」に、報告した日と URL を書く。
-3. 調査の手順の 10 と同じ方法で、一覧を作り直してコミットする。
+3. 報告した件を読み、題、添付、See Also、本文の公開 URL が「送信の準備」で示したとおりかを確かめる。抜けや開けない URL があれば、ユーザーに伝える（直すのはユーザー）。
+4. 調査の手順の 10 と同じ方法で、一覧を作り直してコミットする。
 
 ## 公開前の点検
 
