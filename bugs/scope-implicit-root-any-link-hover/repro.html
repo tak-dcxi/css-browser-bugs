@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>:any-link:hover on the implicit scoping root of a prelude-less @scope</title>
+<!--
+  Testcase for scope-implicit-root-any-link-hover. Released under CC0 1.0.
+  Self-contained: no external resources.
+
+  Each link contains a <style> element with a prelude-less @scope rule.
+  The scoping root of such a rule is the parent element of the <style>
+  element, so it is the link itself, and :scope matches the link
+  (css-cascade-6 §3.5.4). Hovering any link must turn its background
+  green.
+
+  T1 is the original code (the @scope block is left unclosed, as in the
+  report). T2 to T6 change one thing at a time. R is the reference: an
+  ordinary rule outside @scope.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    display: grid;
+    grid-template-columns: 4rem 16rem 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin-block: 0.5rem;
+  }
+
+  .case a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: inherit;
+  }
+
+  code {
+    font: 13px/1.4 ui-monospace, monospace;
+  }
+
+  /* Reference */
+  .ref:any-link:hover {
+    background-color: lime;
+  }
+</style>
+</head>
+<body>
+<h1>:any-link:hover on the implicit scoping root of a prelude-less @scope</h1>
+
+<p>Hover each link. Pass if every link turns green while hovered, like the reference R.</p>
+
+<div class="case">
+  <b>T1</b>
+  <a href="#">
+  <style>
+    @scope {
+      :scope {
+        &:any-link:hover {
+          background-color: lime;
+        }
+      }
+  </style>
+  Hover me</a>
+  <span><code>@scope { :scope { &amp;:any-link:hover {…} }</code> (unclosed)</span>
+</div>
+
+<div class="case">
+  <b>T2</b>
+  <a href="#">
+  <style>
+    @scope {
+      :scope {
+        &:any-link:hover {
+          background-color: lime;
+        }
+      }
+    }
+  </style>
+  Hover me</a>
+  <code>@scope { :scope { &amp;:any-link:hover {…} } }</code>
+</div>
+
+<div class="case">
+  <b>T3</b>
+  <a href="#">
+  <style>
+    @scope {
+      :scope:any-link:hover {
+        background-color: lime;
+      }
+    }
+  </style>
+  Hover me</a>
+  <code>@scope { :scope:any-link:hover {…} }</code>
+</div>
+
+<div class="case">
+  <b>T4</b>
+  <a href="#">
+  <style>
+    @scope {
+      :scope:hover {
+        background-color: lime;
+      }
+    }
+  </style>
+  Hover me</a>
+  <code>@scope { :scope:hover {…} }</code>
+</div>
+
+<div class="case">
+  <b>T5</b>
+  <a href="#">
+  <style>
+    @scope {
+      :scope:any-link {
+        outline: 2px solid blue;
+      }
+    }
+  </style>
+  Hover me</a>
+  <span><code>@scope { :scope:any-link {…} }</code> (no hover: pass if a blue outline is always shown)</span>
+</div>
+
+<div class="case">
+  <b>T6</b>
+  <a href="#" class="explicit">
+  <style>
+    @scope (.explicit) {
+      :scope {
+        &:any-link:hover {
+          background-color: lime;
+        }
+      }
+    }
+  </style>
+  Hover me</a>
+  <code>@scope (.explicit) { :scope { &amp;:any-link:hover {…} } }</code>
+</div>
+
+<div class="case">
+  <b>R</b>
+  <a href="#" class="ref">Hover me</a>
+  <code>.ref:any-link:hover {…}</code>
+</div>
+</body>
+</html>
