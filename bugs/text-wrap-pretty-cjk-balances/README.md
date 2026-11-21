@@ -2,7 +2,7 @@
 title: 和文の text-wrap: pretty が、balance のように各行を短く揃えて折り返す
 slug: text-wrap-pretty-cjk-balances
 created: 2026-11-18
-updated: 2026-11-18
+updated: 2026-11-21
 features: text-wrap-style, text-wrap
 status.webkit: reported
 status.gecko: unsupported
@@ -123,5 +123,6 @@ Blink は期待どおりに動いたので、トラッカーは検索してい�
 
 - WebKit: `reported`。2026-11-18 に [WebKit Bug 332074](https://bugs.webkit.org/show_bug.cgi?id=332074) として報告した。Safari 27.2 と Safari Technology Preview 27.0 で、今も再現する。和文の `text-wrap-style: pretty` が、`auto` で行末がそろう段落でも各行を短くして行を増やし（ケース1）、最終行が半分ほどの段落では `balance` と同じ改行になる（ケース2）。仕様は `pretty` の細部を UA に任せていて、行の長さのばらつきを減らすことも認めているので、`balance` に近い改行そのものは仕様に反しない。しかし和文では、`auto` の時点で行の長さがそろっている。そこから各行を短くして行を増やすことは、仕様が `pretty` に求める「よりよい組版」に当たらないと判断し、報告文を下書きした（[report.webkit.en.md](report.webkit.en.md)）。原因と見られる [288650](https://bugs.webkit.org/show_bug.cgi?id=288650) は、報告文で関連として示す。
   同じ日に、報告文の2点を訂正するコメントを投稿した（[comment 2](https://bugs.webkit.org/show_bug.cgi?id=332074#c2)）。1点目では、幅を変えた比較の「各行が短い」を「最終行を除く各行が短い」に直した。ケース2では、最終行が16文字から28文字に伸びるためである。2点目では、仕様の言い換えを、`pretty` は組版を「よくするべき」（should）という仕様の書き方に合わせた。
+  2026-11-19 に、WebKit の技術者が原因を2つに分けて説明した（[comment 4](https://bugs.webkit.org/show_bug.cgi?id=332074#c4)）。前日には Radar（rdar://problem/193148797）にも取り込まれている。1つ目の原因は、`pretty` の Knuth-Plass の評価が、箱の幅より小さい目標の行幅を使い、目標より短い行にも長い行にも罰を与えることである。和文はほとんどの文字の間で改行できるので、どの行もこの小さい目標にほぼ届き、全行が短くなって行が増える（ケース1）。直し方として、目標を箱の幅にし、短い行だけに罰を与えることを挙げている（[WebKit 332333](https://bugs.webkit.org/show_bug.cgi?id=332333)）。2つ目の原因は、最終行のそろわなさをほかの行と同じように評価することである。そのため最終行が上の行から多くの内容を取り込み、`balance` と同じ改行になりうる（ケース2）。直し方として、最終行には孤立した短い行（orphan）のときだけ罰を与えることを挙げている（[WebKit 332332](https://bugs.webkit.org/show_bug.cgi?id=332332)）。2件とも NEW で、同じ技術者が担当している。332074 は、2件が取り込まれるまで開いたままにすると書いている。
 - Gecko: `unsupported`。Firefox 160.0.1 と Nightly 162.0a1 は `text-wrap-style: pretty` に未対応。実装は [Bug 1960910](https://bugzilla.mozilla.org/show_bug.cgi?id=1960910) が扱っている。
 - Blink: `not-affected`。Chrome 157 と Canary 160 は、どちらのケースでも `pretty` が `auto` と同じ改行になる。
