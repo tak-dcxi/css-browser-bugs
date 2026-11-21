@@ -17,7 +17,7 @@ links.spec: https://drafts.csswg.org/css-contain-2/#content-visibility-animation
 
 ## 症状
 
-`details::details-content` に `transition: content-visibility <時間> allow-discrete` を指定して `details` を閉じると、中身の描画が閉じ始めとほぼ同時に消える。transition 自体は始まっており、`block-size` をあわせて transition させると高さは変わっていく。
+`details::details-content` に `transition: content-visibility <時間> allow-discrete` を指定して `details` を閉じると、中身の描画が閉じ始めとほぼ同時に消える。transition 自体は始まっており、`block-size` をあわせて transition させると高さは変わっていく。Safari 27.2 で、`::details-content` の `block-size` を `2.6rem` から `0` へ 10s で transition させると（`content-visibility` も 10s）、2s の時点で高さは約 30px まで縮んでいる途中だった。その時点の `content-visibility` の計算値は `visible` で、中身は描画されていなかった。Safari は `interpolate-size` に未対応なので、`block-size: auto` から `0` への transition は高さが変わらない。
 
 `details` に固有の症状ではない。普通の `div` で `content-visibility` を `visible` から `hidden` へ transition させても、同じく始めから中身が描画されない。Safari 27.2 と Safari Technology Preview 27.0 で確かめると、transition のあいだの `content-visibility` の計算値は仕様どおり `visible` である。それでも中身は描画されず、中身の要素の `checkVisibility()` は false を返す。計算値ではなく、中身を飛ばす（skip する）かどうかの判定が、transition の始めから終わりの値の `hidden` で行われているように見える。
 
