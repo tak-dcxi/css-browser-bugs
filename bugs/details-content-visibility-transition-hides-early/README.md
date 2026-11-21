@@ -4,10 +4,10 @@ slug: details-content-visibility-transition-hides-early
 created: 2026-11-21
 updated: 2026-11-21
 features: content-visibility, ::details-content, transition-behavior
-status.webkit: drafted
+status.webkit: reported
 status.gecko: not-affected
 status.blink: not-affected
-links.webkit:
+links.webkit: https://bugs.webkit.org/show_bug.cgi?id=332674
 links.gecko:
 links.blink:
 links.spec: https://drafts.csswg.org/css-contain-2/#content-visibility-animation
@@ -100,6 +100,6 @@ Gecko と Blink は期待どおりに動いたので、トラッカーは検索�
 
 ## 結論
 
-- WebKit: `drafted`。Safari 27.2 と Safari Technology Preview 27.0 で、`content-visibility` を `visible` から `hidden` へ transition させると、transition の始めから中身が描画されない。`::details-content` で `details` を閉じるときも、高さを固定した普通の `div` でも同じ。transition のあいだの計算値は `visible` なので、計算値の補間（WPT の `content-visibility-interpolation.html` は通る）ではなく、中身を飛ばすかどうかの判定が終わりの値で行われていると見られる。css-contain-2 §4.1 は transition のあいだの値を `visible` と決めているので、仕様に反する。近い既存の件は [292713](https://bugs.webkit.org/show_bug.cgi?id=292713)（ブロックの子を持つ要素の大きさが先に縮む）だが、中身が描画されないことは扱っていないので、新しい件として報告文を下書きし（[report.webkit.en.md](report.webkit.en.md)）、292713 を関連として示す。292713 へのコメントで伝える方法もある。
+- WebKit: `reported`。2026-11-21 に [WebKit Bug 332674](https://bugs.webkit.org/show_bug.cgi?id=332674) として報告した（Component は Animations、See Also は 292713）。報告の時点でテストケースが Pages に出ていなかったので、公開 URL は URL 欄にも本文にも入れていない。Safari 27.2 と Safari Technology Preview 27.0 で、`content-visibility` を `visible` から `hidden` へ transition させると、transition の始めから中身が描画されない。`::details-content` で `details` を閉じるときも、高さを固定した普通の `div` でも同じ。transition のあいだの計算値は `visible` なので、計算値の補間（WPT の `content-visibility-interpolation.html` は通る）ではなく、中身を飛ばすかどうかの判定が終わりの値で行われていると見られる。css-contain-2 §4.1 は transition のあいだの値を `visible` と決めているので、仕様に反する。近い既存の件は [292713](https://bugs.webkit.org/show_bug.cgi?id=292713)（ブロックの子を持つ要素の大きさが先に縮む）だが、中身が描画されないことは扱っていないので、新しい件として報告し（下書きは [report.webkit.en.md](report.webkit.en.md)）、292713 を関連として示した。
 - Gecko: `not-affected`。Firefox 160.0.1 と Nightly 162.0a1 は、transition のあいだ中身を描画する。
 - Blink: `not-affected`。Chrome 157 と Canary 160 は、transition のあいだ中身を描画する。
