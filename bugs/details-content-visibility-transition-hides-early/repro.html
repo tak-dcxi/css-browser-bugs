@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>details-content-visibility-transition-hides-early</title>
+<!--
+  Testcase for details-content-visibility-transition-hides-early. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  .box {
+    padding: 0.5rem;
+    background: lime;
+  }
+
+  /* Testcase styles */
+
+  /*
+   * The test details is closed by script right after load. The transition
+   * is long, so it is still running when you look at it: per css-contain-2
+   * section 4.1, content-visibility keeps its non-hidden value until the
+   * end of the transition, so the green box must stay painted.
+   */
+  .test::details-content {
+    transition: content-visibility 1000s allow-discrete;
+  }
+
+  /*
+   * The same transition on a plain element, without details. The fixed
+   * block-size (the height of .box) keeps the space, so this case shows only
+   * whether the contents are painted, not whether the element collapses
+   * (WebKit bug 292713).
+   */
+  .plain {
+    block-size: 2.6rem;
+    transition: content-visibility 1000s allow-discrete;
+  }
+
+  .plain.hidden {
+    content-visibility: hidden;
+  }
+
+  /* Same, but you toggle it yourself; the transition takes 3s. */
+  .live::details-content {
+    transition: content-visibility 3s allow-discrete;
+  }
+</style>
+</head>
+<body>
+<h1>details-content-visibility-transition-hides-early</h1>
+
+<p>Pass if both tests and the reference look the same: a green box is shown in each.</p>
+
+<section class="case">
+  <p class="label">Test (closed by script; a 1000s content-visibility transition is running)</p>
+  <details class="test" open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+</section>
+
+<section class="case">
+  <p class="label">Test without details (content-visibility set to hidden by script; a 1000s transition is running)</p>
+  <div class="plain">
+    <div class="box">Content</div>
+  </div>
+</section>
+
+<section class="case">
+  <p class="label">Reference (open, no transition)</p>
+  <details open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+</section>
+
+<section class="case">
+  <p class="label">Interactive: click the summary to close. The green box should stay for 3 seconds, then disappear.</p>
+  <details class="live" open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+</section>
+
+<script>
+  // Close after the first rendering so that the transition starts.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelector('.test').open = false;
+      document.querySelector('.plain').classList.add('hidden');
+    });
+  });
+</script>
+</body>
+</html>
