@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>anchor-name on the thumb pseudo-element of a range input</title>
+<!--
+  Testcase for range-thumb-anchor-name. Released under CC0 1.0.
+  Self-contained: no external resources.
+
+  Each range input is 300px wide with a 20px thumb and value 75, so the
+  thumb's left edge is at (300px - 20px) * 0.75 = 210px.
+
+  A blue marker below the input is positioned with
+  left: anchor(left, 0px). If the anchor is found, the marker is under the
+  thumb (left: 210px). If not, the fallback puts it at the left edge (0px).
+
+  Gecko uses ::-moz-range-thumb; WebKit and Blink use
+  ::-webkit-slider-thumb. The rules are separate because a selector list
+  with an unknown pseudo-element is dropped entirely.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  /* Testcase styles */
+  .box {
+    position: relative;
+    inline-size: 300px;
+    block-size: 48px;
+    background: #eee;
+  }
+
+  input[type="range"] {
+    display: block;
+    inline-size: 300px;
+    block-size: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #ccc;
+    appearance: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    inline-size: 20px;
+    block-size: 20px;
+    border: 0;
+    border-radius: 0;
+    background: #333;
+    appearance: none;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    inline-size: 20px;
+    block-size: 20px;
+    border: 0;
+    border-radius: 0;
+    background: #333;
+    appearance: none;
+  }
+
+  .marker {
+    position: absolute;
+    top: 28px;
+    left: anchor(left, 0px);
+    inline-size: 20px;
+    block-size: 20px;
+    background: blue;
+  }
+
+  /* Test: the anchor is the thumb pseudo-element. */
+  #test::-webkit-slider-thumb { anchor-name: --thumb; }
+  #test::-moz-range-thumb     { anchor-name: --thumb; }
+  .test .marker { position-anchor: --thumb; }
+
+  /* Control: the anchor is a real element at the same place. */
+  .fake-thumb {
+    position: absolute;
+    top: 0;
+    left: 210px;
+    inline-size: 20px;
+    block-size: 20px;
+    background: #333;
+  }
+
+  .control .fake-thumb { anchor-name: --control; }
+  .control .marker     { position-anchor: --control; }
+
+  /* Reference: no anchor positioning. */
+  .reference .marker { left: 210px; }
+
+  .track {
+    block-size: 20px;
+    background: #ccc;
+  }
+</style>
+</head>
+<body>
+<h1>anchor-name on the thumb pseudo-element of a range input</h1>
+
+<p>Pass if the blue square is directly under the dark thumb in all three boxes. Fail if, in Test, the blue square is at the left edge.</p>
+
+<section class="case">
+  <p class="label">Test: <code>anchor-name</code> on <code>::-moz-range-thumb</code> / <code>::-webkit-slider-thumb</code></p>
+  <div class="box test">
+    <input id="test" type="range" min="0" max="100" value="75" aria-label="Test">
+    <div class="marker"></div>
+  </div>
+</section>
+
+<section class="case">
+  <p class="label">Control: <code>anchor-name</code> on a real element</p>
+  <div class="box control">
+    <div class="track"></div>
+    <div class="fake-thumb"></div>
+    <div class="marker"></div>
+  </div>
+</section>
+
+<section class="case">
+  <p class="label">Reference: no anchor positioning</p>
+  <div class="box reference">
+    <div class="track"></div>
+    <div class="fake-thumb"></div>
+    <div class="marker"></div>
+  </div>
+</section>
+</body>
+</html>
