@@ -6,7 +6,7 @@ updated: 2026-11-24
 features: "CSS Anchor Positioning, anchor-name, anchor(), ::-moz-range-thumb, ::-webkit-slider-thumb, ::slider-thumb"
 status.webkit: not-affected
 status.gecko: duplicate
-status.blink: investigating
+status.blink: not-affected
 links.webkit:
 links.gecko: https://bugzilla.mozilla.org/show_bug.cgi?id=1993699
 links.blink:
@@ -51,10 +51,10 @@ OS: macOS 27.2.1。確認日: 2026-11-24。
 | Safari Technology Preview | 27.0 (22627.1.6.3) | なし | 合格。Safari 27.2 と同じ |
 | Firefox | 160.0.1 | なし | 失敗。Test の青い四角が左端（0px）にある。Control と Reference は 210px |
 | Firefox Nightly | 163.0a1 | なし | 失敗。Firefox 160.0.1 と同じ |
-| Google Chrome | 158.0.8127.88 | なし | 未確認 |
-| Google Chrome Canary | 160.0.8180.0 | なし | 未確認 |
+| Google Chrome | 158.0.8127.88 | なし | 合格。Test の青い四角がつまみの真下にある |
+| Google Chrome Canary | 160.0.8180.0 | なし | 合格。Chrome 158 と同じ |
 
-Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の DevTools の MCP サーバで青い四角の位置も測った（Test 0px、Control 210px、Reference 210px）。Safari の2つは測った値だけで、目で見た判定はまだない。Chrome の2つは判定がまだない。Claude のデスクトップアプリの組み込みブラウザ（Chromium）では、3つの青い四角がどれも 210px だった。
+Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の DevTools の MCP サーバで青い四角の位置も測った（Test 0px、Control 210px、Reference 210px）。Chrome の2つは目で見た判定。Safari の2つは測った値だけで、目で見た判定はない。
 
 ## web-platform-tests
 
@@ -101,4 +101,4 @@ Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の Dev
 - **Gecko: `duplicate`**。[bug 1993699](https://bugzilla.mozilla.org/show_bug.cgi?id=1993699)「Consider allowing ::-moz-range-thumb to be tree-abiding pseudo for anchor positioning」（NEW、Core / CSS Parsing and Computation）が同じ症状を扱っている。2025-10-10 に Mozilla の開発者が起票した。2026-01-16 のコメントには、アンカーとして受け付ける擬似要素の一覧に足すだけでは足りず、スライダーの値が変わったときに配置した要素を更新する仕組みが要る、とある。2026-10-22 のコメントには、スクロールの補正と同じ仕組みにつなぐのが正しいやり方だ、とある。[bug 2083398](https://bugzilla.mozilla.org/show_bug.cgi?id=2083398) は、この件の重複として閉じられている。
   - 原因の箇所: Gecko の [`IsFullyStyleableTreeAbidingOrNotPseudoElement`](https://searchfox.org/firefox-main/rev/05ea3f8e9fd32050f86babe19eddc88e77a1ca64/layout/base/AnchorPositioningUtils.cpp#161) は、アンカーとして受け付ける擬似要素を `::before`、`::after`、`::marker` に限っている。`::-moz-range-thumb` はこの一覧にないので、アンカーの候補から外れる。
 - **WebKit: `not-affected`**。`::-webkit-slider-thumb` に指定した `anchor-name` で、つまみがアンカーになる（Safari の2つで測った値）。
-- **Blink: `investigating`**。組み込みブラウザの Chromium 156 ではつまみがアンカーになったが、Chrome 158 と Canary 160 の判定がまだない。
+- **Blink: `not-affected`**。`::-webkit-slider-thumb` に指定した `anchor-name` で、つまみがアンカーになる（Chrome 158 と Canary 160）。
