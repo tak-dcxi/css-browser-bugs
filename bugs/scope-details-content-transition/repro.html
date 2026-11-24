@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scope-details-content-transition</title>
+<!--
+  Testcase for scope-details-content-transition. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  .computed {
+    margin: 0.25rem 0 0;
+    font: 0.875rem/1.4 ui-monospace, monospace;
+  }
+
+  .box {
+    padding: 0.5rem;
+  }
+
+  .ref .box {
+    background: lime;
+  }
+
+  /* Testcase styles */
+
+  /* T0: control, outside @scope. */
+  .t0::details-content {
+    background: lime;
+  }
+
+  /* T1: the scoping root is the details; :scope::details-content. */
+  @scope (.t1) {
+    :scope::details-content {
+      background: lime;
+    }
+  }
+
+  /* T2: the scoping root is the details; &::details-content. */
+  @scope (.t2) {
+    &::details-content {
+      background: lime;
+    }
+  }
+
+  /* T3: the scoping root is a wrapper; details::details-content. */
+  @scope (.t3) {
+    details::details-content {
+      background: lime;
+    }
+  }
+
+  /*
+   * T4: the scoping root is a wrapper; the selector starts with the
+   * pseudo-element. Per css-cascade-6 it is relative to :scope with a
+   * descendant combinator: :scope *::details-content.
+   */
+  @scope (.t4) {
+    ::details-content {
+      background: lime;
+    }
+  }
+
+  /* T5: control for T3 and T4, the same structure without @scope. */
+  .t5 details::details-content {
+    background: lime;
+  }
+</style>
+</head>
+<body>
+<h1>scope-details-content-transition</h1>
+
+<p>Pass if every test looks like the reference: the content has a lime background. The line under each test shows the value that <code>getComputedStyle(details, '::details-content')</code> returns.</p>
+
+<section class="case">
+  <p class="label">T0: control, outside @scope</p>
+  <details class="t0 test" open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+  <p class="computed"></p>
+</section>
+
+<section class="case">
+  <p class="label">T1: @scope (.t1) { :scope::details-content }</p>
+  <details class="t1 test" open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+  <p class="computed"></p>
+</section>
+
+<section class="case">
+  <p class="label">T2: @scope (.t2) { &amp;::details-content }</p>
+  <details class="t2 test" open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+  <p class="computed"></p>
+</section>
+
+<section class="case">
+  <p class="label">T3: @scope (.t3) { details::details-content } (root is a wrapper)</p>
+  <div class="t3">
+    <details class="test" open>
+      <summary>Summary</summary>
+      <div class="box">Content</div>
+    </details>
+  </div>
+  <p class="computed"></p>
+</section>
+
+<section class="case">
+  <p class="label">T4: @scope (.t4) { ::details-content } (root is a wrapper)</p>
+  <div class="t4">
+    <details class="test" open>
+      <summary>Summary</summary>
+      <div class="box">Content</div>
+    </details>
+  </div>
+  <p class="computed"></p>
+</section>
+
+<section class="case">
+  <p class="label">T5: control, .t5 details::details-content without @scope</p>
+  <div class="t5">
+    <details class="test" open>
+      <summary>Summary</summary>
+      <div class="box">Content</div>
+    </details>
+  </div>
+  <p class="computed"></p>
+</section>
+
+<section class="case">
+  <p class="label">Reference</p>
+  <details class="ref" open>
+    <summary>Summary</summary>
+    <div class="box">Content</div>
+  </details>
+</section>
+
+<script>
+  for (const section of document.querySelectorAll('.case')) {
+    const details = section.querySelector('.test');
+    if (!details) continue;
+    const value = getComputedStyle(details, '::details-content').backgroundColor;
+    section.querySelector('.computed').textContent = `computed background-color: ${value}`;
+  }
+</script>
+</body>
+</html>
