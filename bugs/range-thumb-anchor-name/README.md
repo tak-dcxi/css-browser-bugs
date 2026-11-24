@@ -6,7 +6,7 @@ updated: 2026-11-24
 features: "CSS Anchor Positioning, anchor-name, anchor(), ::-moz-range-thumb, ::-webkit-slider-thumb, ::slider-thumb"
 status.webkit: not-affected
 status.gecko: duplicate
-status.blink: not-affected
+status.blink: investigating
 links.webkit:
 links.gecko: https://bugzilla.mozilla.org/show_bug.cgi?id=1993699
 links.blink:
@@ -24,11 +24,11 @@ links.spec: https://drafts.csswg.org/css-anchor-position-1/#target
 ## 期待する挙動と根拠
 
 - [CSS Anchor Positioning 1 の 2.1](https://drafts.csswg.org/css-anchor-position-1/#name): `anchor-name` の「Applies to」は「all elements that generate a principal box」。
-- [2.3 の acceptable anchor element](https://drafts.csswg.org/css-anchor-position-1/#target): アンカーになれる条件の1つめが「element or a fully styleable pseudo-element」。
+- [2.3 の acceptable anchor element](https://drafts.csswg.org/css-anchor-position-1/#target): アンカーになれる条件の1つめは、要素か、fully styleable な擬似要素であること。
 - [csswg-drafts#12949](https://github.com/w3c/csswg-drafts/issues/12949)（閉）で、CSSWG は「fully styleable な tree-abiding 擬似要素だけがアンカーになれる（`::placeholder` と `::marker` は含まない）」と決議した。
 - [CSS Form Control Styling 1 の 4.4](https://drafts.csswg.org/css-forms-1/#slider-pseudos): 標準のつまみの擬似要素 `::slider-thumb` は fully styleable pseudo-element と定められている。
 
-仕様の判断: 標準の `::slider-thumb` がアンカーになれることは、仕様が決めている。一方、`::-moz-range-thumb` と `::-webkit-slider-thumb` はエンジン独自の擬似要素で、アンカーになれるかを仕様は決めていない。確かめた時点では、`::slider-thumb` を実装したエンジンはない（Safari 27.2、Safari Technology Preview、Firefox 160.0.1 で `CSS.supports("selector(::slider-thumb)")` が `false`）。そのため、Gecko の挙動を仕様違反とは言えない。ただし、WebKit と Blink は `::-webkit-slider-thumb` をアンカーとして扱うので、エンジンのあいだで結果が食い違う。
+仕様の判断: 標準の `::slider-thumb` がアンカーになれることは、仕様が決めている。一方、`::-moz-range-thumb` と `::-webkit-slider-thumb` はエンジン独自の擬似要素で、アンカーになれるかを仕様は決めていない。`CSS.supports("selector(::slider-thumb)")` は、確かめた4つ（Safari 27.2、Safari Technology Preview、Firefox 160.0.1、組み込みブラウザの Chromium 156）でどれも `false` だった。Firefox Nightly と Chrome の2つでは確かめていない。そのため、Gecko の挙動を仕様違反とは言えない。ただし、WebKit と Blink は `::-webkit-slider-thumb` をアンカーとして扱うので、エンジンのあいだで結果が食い違う。
 
 関係する議論:
 
@@ -51,10 +51,10 @@ OS: macOS 27.2.1。確認日: 2026-11-24。
 | Safari Technology Preview | 27.0 (22627.1.6.3) | なし | 合格。Safari 27.2 と同じ |
 | Firefox | 160.0.1 | なし | 失敗。Test の青い四角が左端（0px）にある。Control と Reference は 210px |
 | Firefox Nightly | 163.0a1 | なし | 失敗。Firefox 160.0.1 と同じ |
-| Google Chrome | 158.0.8127.88 | なし | 合格 |
-| Google Chrome Canary | 160.0.8180.0 | なし | 合格 |
+| Google Chrome | 158.0.8127.88 | なし | 未確認 |
+| Google Chrome Canary | 160.0.8180.0 | なし | 未確認 |
 
-Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の DevTools の MCP サーバで青い四角の位置も測った（Test 0px、Control 210px、Reference 210px）。Chrome の2つは、目で見た判定で失敗がなかった。
+Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の DevTools の MCP サーバで青い四角の位置も測った（Test 0px、Control 210px、Reference 210px）。Safari の2つは測った値だけで、目で見た判定はまだない。Chrome の2つは判定がまだない。Claude のデスクトップアプリの組み込みブラウザ（Chromium）では、3つの青い四角がどれも 210px だった。
 
 ## web-platform-tests
 
@@ -79,18 +79,18 @@ Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の Dev
 
 | 検索先 | 検索語 | 件数 | 関係する件 |
 |---|---|---|---|
-| csswg-drafts | anchor-name pseudo-element | 87（1ページ目だけを見た） | [#11792](https://github.com/w3c/csswg-drafts/issues/11792)（閉、擬似要素の暗黙のアンカー。この件とは別の話） |
+| csswg-drafts | anchor-name pseudo-element | 87（1ページ目だけを見た） | なし（[#11792](https://github.com/w3c/csswg-drafts/issues/11792) は、擬似要素の暗黙のアンカーの件。題だけで判断した） |
 | csswg-drafts | anchor pseudo-element | 133（1ページ目だけを見た） | [#12949](https://github.com/w3c/csswg-drafts/issues/12949) |
-| csswg-drafts | anchor slider-thumb | 5 | [#14234](https://github.com/w3c/csswg-drafts/issues/14234) |
+| csswg-drafts | anchor slider-thumb | 5 | [#14234](https://github.com/w3c/csswg-drafts/issues/14234)（#11792 も出た） |
 | csswg-drafts | anchor element-backed pseudo-element | 5 | なし |
 | csswg-drafts | slider-thumb anchor | 5 | 「anchor slider-thumb」と同じ5件 |
 | csswg-drafts | acceptable anchor element pseudo | 未実行 | ブラウザでのページの移動が自動判定で拒否された |
 | Mozilla Bugzilla | anchor-name pseudo-element | 0 | |
 | Mozilla Bugzilla | anchor-name range-thumb | 0 | |
-| Mozilla Bugzilla | anchor range thumb | 2 | [1993699](https://bugzilla.mozilla.org/show_bug.cgi?id=1993699)、[2083398](https://bugzilla.mozilla.org/show_bug.cgi?id=2083398)（1993699 の重複） |
+| Mozilla Bugzilla | anchor range thumb | 2 | [1993699](https://bugzilla.mozilla.org/show_bug.cgi?id=1993699)、[2083398](https://bugzilla.mozilla.org/show_bug.cgi?id=2083398)（1993699 の重複。中身は開いていない） |
 | Mozilla Bugzilla | anchor-name -moz-range-thumb | 35 | なし（`-moz-range-thumb` が検索に効かず、実質は `anchor-name` だけの検索） |
 | Mozilla Bugzilla | anchor slider | 1 | なし |
-| Mozilla Bugzilla | anchor pseudo-element | 12 | なし（[1925801](https://bugzilla.mozilla.org/show_bug.cgi?id=1925801) は `::before` と `::after` のアンカー） |
+| Mozilla Bugzilla | anchor pseudo-element | 12 | なし（[1925801](https://bugzilla.mozilla.org/show_bug.cgi?id=1925801)「Support pseudo-element anchor positioning」は WORKSFORME。題だけで判断した） |
 | Mozilla Bugzilla | anchor positioning pseudo | 5 | 1993699 |
 | Mozilla Bugzilla | range thumb anchor positioning | 1 | 1993699 |
 | Mozilla Bugzilla | anchor input range | 0 | |
@@ -100,4 +100,5 @@ Firefox の2つは目で見た判定で、Firefox 160.0.1 では Firefox の Dev
 
 - **Gecko: `duplicate`**。[bug 1993699](https://bugzilla.mozilla.org/show_bug.cgi?id=1993699)「Consider allowing ::-moz-range-thumb to be tree-abiding pseudo for anchor positioning」（NEW、Core / CSS Parsing and Computation）が同じ症状を扱っている。2025-10-10 に Mozilla の開発者が起票した。2026-01-16 のコメントには、アンカーとして受け付ける擬似要素の一覧に足すだけでは足りず、スライダーの値が変わったときに配置した要素を更新する仕組みが要る、とある。2026-10-22 のコメントには、スクロールの補正と同じ仕組みにつなぐのが正しいやり方だ、とある。[bug 2083398](https://bugzilla.mozilla.org/show_bug.cgi?id=2083398) は、この件の重複として閉じられている。
   - 原因の箇所: Gecko の [`IsFullyStyleableTreeAbidingOrNotPseudoElement`](https://searchfox.org/firefox-main/rev/05ea3f8e9fd32050f86babe19eddc88e77a1ca64/layout/base/AnchorPositioningUtils.cpp#161) は、アンカーとして受け付ける擬似要素を `::before`、`::after`、`::marker` に限っている。`::-moz-range-thumb` はこの一覧にないので、アンカーの候補から外れる。
-- **WebKit: `not-affected`**、**Blink: `not-affected`**。`::-webkit-slider-thumb` に指定した `anchor-name` で、つまみがアンカーになる。
+- **WebKit: `not-affected`**。`::-webkit-slider-thumb` に指定した `anchor-name` で、つまみがアンカーになる（Safari の2つで測った値）。
+- **Blink: `investigating`**。組み込みブラウザの Chromium 156 ではつまみがアンカーになったが、Chrome 158 と Canary 160 の判定がまだない。
