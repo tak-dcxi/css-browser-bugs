@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scroll-into-view-vertical-block-start</title>
+<!--
+  Testcase for scroll-into-view-vertical-block-start. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  /* Testcase styles */
+  .scroller {
+    writing-mode: vertical-rl;
+    inline-size: 100px;
+    block-size: 300px;
+    overflow: hidden;
+    border: 2px solid;
+  }
+
+  .pad {
+    block-size: 300px;
+    background: silver;
+  }
+
+  .target {
+    block-size: 50px;
+    background: green;
+  }
+</style>
+</head>
+<body>
+<h1>scroll-into-view-vertical-block-start</h1>
+
+<p>Each Test box calls <code>scrollIntoView()</code> on the green box inside a <code>writing-mode: vertical-rl</code> scroller. With the default <code>block: "start"</code>, the green box should be aligned to the block-start edge (the right edge).</p>
+<p>Pass if every Test box looks the same as the Reference box.</p>
+
+<section class="case">
+  <p class="label">Test: <code>scrollIntoView()</code></p>
+  <div class="scroller" id="no-args"><div class="pad"></div><div class="target"></div><div class="pad"></div></div>
+</section>
+
+<section class="case">
+  <p class="label">Test: <code>scrollIntoView({ block: "start" })</code></p>
+  <div class="scroller" id="block-start"><div class="pad"></div><div class="target"></div><div class="pad"></div></div>
+</section>
+
+<section class="case">
+  <p class="label">Reference</p>
+  <!-- Not scrolled: the green box is the first child, so it sits at the block-start edge. -->
+  <div class="scroller"><div class="target"></div><div class="pad"></div><div class="pad"></div></div>
+</section>
+
+<script>
+  document.querySelector('#no-args .target').scrollIntoView();
+  document.querySelector('#block-start .target').scrollIntoView({ block: 'start' });
+</script>
+</body>
+</html>
