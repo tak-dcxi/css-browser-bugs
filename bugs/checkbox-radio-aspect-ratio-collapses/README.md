@@ -4,10 +4,10 @@ slug: checkbox-radio-aspect-ratio-collapses
 created: 2026-11-25
 updated: 2026-11-25
 features: CSS Box Sizing Level 4, aspect-ratio, input type=checkbox, input type=radio, appearance
-status.webkit: drafted
+status.webkit: reported
 status.gecko: not-affected
 status.blink: not-affected
-links.webkit:
+links.webkit: https://bugs.webkit.org/show_bug.cgi?id=333010
 links.gecko:
 links.blink:
 links.spec: https://drafts.csswg.org/css-sizing-4/#aspect-ratio
@@ -97,6 +97,6 @@ Gecko と Blink は期待どおりに動いたので、トラッカーは検索�
 
 ## 結論
 
-- WebKit: `drafted`。報告文の下書きは [report.webkit.en.md](report.webkit.en.md)。Safari 27.2 と Safari Technology Preview 27.0 で、`appearance: auto` のチェックボックスとラジオボタンは、幅だけを書いても `aspect-ratio` で高さが決まらず、12px のままになる。同じ条件の既存の報告は、上の検索では見つからなかった。仕様（css-sizing-4 §4.1、css-ui-4 §7.2、HTML §15.5.10）に照らすと、高さは幅と比率から決まるはずで、Safari の挙動は仕様と合わない。目で見る判定はまだしていない。
+- WebKit: `reported`。2026-11-25 に [WebKit Bug 333010](https://bugs.webkit.org/show_bug.cgi?id=333010) として報告した。送った本文は下書きの [report.webkit.en.md](report.webkit.en.md) と同じ。Safari 27.2 と Safari Technology Preview 27.0 で、`appearance: auto` のチェックボックスとラジオボタンは、幅だけを書いても `aspect-ratio` で高さが決まらず、12px のままになる。同じ条件の既存の報告は、上の検索では見つからなかった。仕様（css-sizing-4 §4.1、css-ui-4 §7.2、HTML §15.5.10）に照らすと、高さは幅と比率から決まるはずで、Safari の挙動は仕様と合わない。目で見る判定はまだしていない。
 - Gecko: `not-affected`。Firefox 160.0.1 は 20 行すべて合格。
 - Blink: `not-affected`。Chrome 157 は 20 行すべて合格。

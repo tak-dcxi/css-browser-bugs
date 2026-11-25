@@ -62,7 +62,7 @@ GitHub は frontmatter を YAML として読み、読めないときは表の代
 | 件 | WebKit | Gecko | Blink | 更新 |
 |---|---|---|---|---|
 | [アンカーで配置した ::after のトランジションが、元の要素に :has() の規則が当たると始まらない](bugs/anchor-pseudo-transition-has-originating/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332060) | unsupported | not-affected | 2026-11-25 |
-| [チェックボックスとラジオボタンの aspect-ratio が守られず、潰れる](bugs/checkbox-radio-aspect-ratio-collapses/) | drafted | not-affected | not-affected | 2026-11-25 |
+| [チェックボックスとラジオボタンの aspect-ratio が守られず、潰れる](bugs/checkbox-radio-aspect-ratio-collapses/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=333010) | not-affected | not-affected | 2026-11-25 |
 | [content-visibility を hidden へ transition させると、始めから中身が描画されない（::details-content の閉じるアニメーション）](bugs/details-content-visibility-transition-hides-early/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332674) | not-affected | not-affected | 2026-11-24 |
 | [段組みの2段目にある絶対配置の要素が、段に分ける前の位置に置かれて下にずれる](bugs/multicol-abspos-static-position-unfragmented/) | duplicate [1](https://bugs.webkit.org/show_bug.cgi?id=137506) | not-affected | not-affected | 2026-11-25 |
 | [progress() に長さを渡して未登録のカスタムプロパティに入れ、calc() で使えるか（対応状況の確認）](bugs/progress-function-length-custom-property/) | not-affected | not-affected | not-affected | 2026-11-25 |
