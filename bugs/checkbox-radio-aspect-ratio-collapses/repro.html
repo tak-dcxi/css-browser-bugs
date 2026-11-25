@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>checkbox-radio-aspect-ratio-collapses</title>
+<!--
+  Testcase for checkbox-radio-aspect-ratio-collapses. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid;
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .pass {
+    background: #cfc;
+    color: #000;
+  }
+
+  .fail {
+    background: #fcc;
+    color: #000;
+  }
+
+  /* Testcase styles */
+  .box {
+    inline-size: 12rem;
+  }
+
+  .flex {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem;
+  }
+
+  .start {
+    align-items: start;
+  }
+
+  /* The size under test: only the inline size is given; the block size comes from aspect-ratio. */
+  .test {
+    inline-size: 36px;
+    aspect-ratio: 1;
+    flex: none;
+    margin: 0;
+  }
+
+  /* The reference gives both sizes. */
+  .reference {
+    inline-size: 36px;
+    block-size: 36px;
+    flex: none;
+    margin: 0;
+  }
+
+  .none {
+    appearance: none;
+    border: 2px solid;
+  }
+</style>
+</head>
+<body>
+<h1>checkbox-radio-aspect-ratio-collapses</h1>
+
+<p>
+  Each row has a test control (<code>inline-size: 36px; aspect-ratio: 1</code>) and a reference control
+  (<code>inline-size: 36px; block-size: 36px</code>). In the rows marked "square expected", pass if the
+  test control is a 36px square like the reference. In the stretched flex rows the control is expected to
+  be as tall as the flex line (36px with the one-line label, the height of the label with the two-line
+  label), because a flex item with an automatic block size is stretched.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Case</th><th>Test</th><th>Reference</th><th>Test size</th><th>Expected</th><th>Result</th></tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<p id="ua"></p>
+
+<script>
+  const contexts = [
+    { name: 'block', className: 'box', square: true },
+    { name: 'flex, align-items: start', className: 'box flex start', square: true },
+    { name: 'flex, one-line label (stretch)', className: 'box flex', square: false, label: 'Label' },
+    { name: 'flex, two-line label (stretch)', className: 'box flex', square: false },
+    { name: 'grid (normal alignment)', className: 'box grid', square: true },
+  ];
+  const rows = document.getElementById('rows');
+  const cases = [];
+
+  for (const type of ['checkbox', 'radio']) {
+    for (const appearance of ['auto', 'none']) {
+      for (const context of contexts) {
+        const row = rows.insertRow();
+        row.insertCell().textContent = `${type}, appearance: ${appearance}, ${context.name}`;
+        const make = (kind) => {
+          const box = document.createElement('div');
+          box.className = context.className;
+          const input = document.createElement('input');
+          input.type = type;
+          input.checked = true;
+          input.className = `${kind}${appearance === 'none' ? ' none' : ''}`;
+          const label = document.createElement('span');
+          label.textContent = context.label ?? 'A label that wraps onto two lines here';
+          box.append(input, label);
+          row.insertCell().append(box);
+          return { input, label };
+        };
+        cases.push({ row, context, test: make('test'), reference: make('reference') });
+      }
+    }
+  }
+
+  const round = (value) => Math.round(value * 100) / 100;
+  for (const { row, context, test } of cases) {
+    const rect = test.input.getBoundingClientRect();
+    const labelHeight = test.label.getBoundingClientRect().height;
+    // A stretched flex item takes the height of the flex line. The line is as tall as its tallest item:
+    // the label, or the control at the height its aspect-ratio gives (36px).
+    const expectedHeight = context.square ? 36 : Math.max(36, labelHeight);
+    const pass = Math.abs(rect.width - 36) < 0.5 && Math.abs(rect.height - expectedHeight) < 0.5;
+    row.insertCell().textContent = `${round(rect.width)} × ${round(rect.height)} (computed block-size: ${getComputedStyle(test.input).blockSize})`;
+    row.insertCell().textContent = `36 × ${round(expectedHeight)}${context.square ? ' (square expected)' : ' (stretched)'}`;
+    const result = row.insertCell();
+    result.textContent = pass ? 'PASS' : 'FAIL';
+    result.className = pass ? 'pass' : 'fail';
+  }
+  document.getElementById('ua').textContent = navigator.userAgent;
+  document.documentElement.dataset.done = 'true';
+</script>
+</body>
+</html>

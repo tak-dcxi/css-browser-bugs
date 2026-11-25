@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>multicol-abspos-static-position-unfragmented</title>
+<!--
+  Testcase for multicol-abspos-static-position-unfragmented. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  iframe {
+    display: block;
+    inline-size: 420px;
+    block-size: 200px;
+    border: 1px solid;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid;
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .pass {
+    background: #cfc;
+    color: #000;
+  }
+
+  .fail {
+    background: #fcc;
+    color: #000;
+  }
+</style>
+</head>
+<body>
+<h1>multicol-abspos-static-position-unfragmented</h1>
+
+<p>
+  Each frame is 200px tall and holds a two-column container of the same height. The link "Two" in the second column contains a
+  small out-of-flow box (red, 10px) with automatic insets. Pass if the red box sits at the start of the
+  link "Two" (top of the second column), the frame cannot be scrolled, and every row says PASS.
+  Fail if the red box is 200px lower (below the container) or the frame scrolls.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Case</th><th>Frame</th><th>Box top − link top</th><th>Frame scroll height − container height</th><th>Result</th></tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<p id="ua"></p>
+
+<script>
+  const cases = [
+    {
+      name: 'position: absolute, containing block outside the multicol container (initial containing block)',
+      box: 'position: absolute;',
+      link: '',
+    },
+    {
+      name: 'position: absolute, containing block inside the column (link has position: relative)',
+      box: 'position: absolute;',
+      link: 'position: relative;',
+    },
+    {
+      name: 'position: absolute with clipping and a negative margin (a common visually-hidden pattern), containing block outside',
+      box: 'position: absolute; overflow: clip; clip-path: inset(50%); margin: -1px;',
+      link: '',
+      offset: -1,
+    },
+    {
+      name: 'position: fixed, automatic insets',
+      box: 'position: fixed;',
+      link: '',
+    },
+  ];
+
+  const frameDocument = ({ box, link }) => `<!doctype html>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; }
+  body { font: 16px/20px system-ui, sans-serif; }
+  .multicol { columns: 2; column-gap: 0; inline-size: 400px; block-size: 200px; background: #eee; color: #000; }
+  .item { block-size: 200px; break-inside: avoid; }
+  a { display: inline-block; ${link} }
+  .box { ${box} inline-size: 10px; block-size: 10px; background: red; }
+</style>
+<div class="multicol">
+  <div class="item">One</div>
+  <div class="item"><a href="#">Two<span class="box"></span></a></div>
+</div>`;
+
+  const rows = document.getElementById('rows');
+  let pending = cases.length;
+
+  for (const testCase of cases) {
+    const row = rows.insertRow();
+    row.insertCell().textContent = testCase.name;
+    const frame = document.createElement('iframe');
+    frame.title = testCase.name;
+    row.insertCell().append(frame);
+    const offsetCell = row.insertCell();
+    const scrollCell = row.insertCell();
+    const resultCell = row.insertCell();
+    frame.addEventListener('load', () => {
+      const doc = frame.contentDocument;
+      const boxTop = doc.querySelector('.box').getBoundingClientRect().top;
+      const linkTop = doc.querySelector('a').getBoundingClientRect().top;
+      const extra = doc.documentElement.scrollHeight - doc.querySelector('.multicol').getBoundingClientRect().height;
+      const offset = boxTop - linkTop;
+      // The static position is on the first line of the link, so the box starts within that 20px line.
+      const expected = testCase.offset ?? 0;
+      const pass = offset >= expected && offset <= expected + 20 && extra < 0.5;
+      offsetCell.textContent = `${offset}px`;
+      scrollCell.textContent = `${extra}px`;
+      resultCell.textContent = pass ? 'PASS' : 'FAIL';
+      resultCell.className = pass ? 'pass' : 'fail';
+      pending -= 1;
+      if (pending === 0) {
+        document.getElementById('ua').textContent = navigator.userAgent;
+        document.documentElement.dataset.done = 'true';
+      }
+    });
+    frame.srcdoc = frameDocument(testCase);
+  }
+</script>
+</body>
+</html>

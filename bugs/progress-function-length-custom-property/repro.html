@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>progress-function-length-custom-property</title>
+<!--
+  Testcase for progress-function-length-custom-property. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  iframe {
+    display: block;
+    block-size: 4rem;
+    margin-block: 0.25rem 1rem;
+    border: 1px solid;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid;
+    text-align: start;
+  }
+
+  .pass {
+    background: #cfc;
+    color: #000;
+  }
+
+  .fail {
+    background: #fcc;
+    color: #000;
+  }
+</style>
+</head>
+<body>
+<h1>progress-function-length-custom-property</h1>
+
+<p>
+  Each frame has a different width (below, inside and above the 375px–1280px range). In each frame the
+  first line is sized with <code>progress()</code> stored in an unregistered custom property and used in
+  <code>calc()</code>; the second line is sized with the equivalent <code>clamp()</code>.
+  Pass if both lines in every frame have the same indent and font size, and every row below says PASS.
+</p>
+
+<div id="frames"></div>
+
+<table>
+  <thead>
+    <tr><th>Frame width</th><th>progress(): padding / font-size</th><th>clamp(): padding / font-size</th><th>Result</th></tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<p id="supports"></p>
+<p id="ua"></p>
+
+<script>
+  // The frame document. The custom properties mirror a fluid-size setup:
+  // --p is the position of the viewport inline size in the range, as a number from 0 to 1.
+  const frameDocument = `<!doctype html>
+<meta charset="utf-8">
+<style>
+  :root {
+    --min-width: 375;
+    --max-width: 1280;
+    --p: progress(100svi, var(--min-width) / 16 * 1rem, var(--max-width) / 16 * 1rem);
+    --gutter: calc((16 + (64 - 16) * var(--p)) * 1px);
+    --font-size: calc((14 + (18 - 14) * var(--p)) / 16 * 1rem);
+    --gutter-ref: clamp(
+      16px,
+      (64 - 16) / (var(--max-width) - var(--min-width)) * 100svi +
+        (16 - (64 - 16) / (var(--max-width) - var(--min-width)) * var(--min-width)) * 1px,
+      64px
+    );
+    --font-size-ref: clamp(
+      14 / 16 * 1rem,
+      (18 - 14) / (var(--max-width) - var(--min-width)) * 100svi +
+        (14 - (18 - 14) / (var(--max-width) - var(--min-width)) * var(--min-width)) / 16 * 1rem,
+      18 / 16 * 1rem
+    );
+  }
+  body { margin: 0; overflow: hidden; font-family: system-ui, sans-serif; line-height: 1.4; }
+  p { margin: 0; }
+  .test { padding-inline-start: var(--gutter); font-size: var(--font-size); }
+  .reference { padding-inline-start: var(--gutter-ref); font-size: var(--font-size-ref); }
+</style>
+<p class="test">Test: progress()</p>
+<p class="reference">Reference: clamp()</p>`;
+
+  const widths = [300, 800, 1400];
+  const frames = document.getElementById('frames');
+  const rows = document.getElementById('rows');
+
+  const measure = (frame) => {
+    const read = (selector) => {
+      const style = frame.contentWindow.getComputedStyle(frame.contentDocument.querySelector(selector));
+      return [parseFloat(style.paddingLeft), parseFloat(style.fontSize)];
+    };
+    return { test: read('.test'), reference: read('.reference') };
+  };
+
+  let loaded = 0;
+  const results = [];
+  widths.forEach((width, index) => {
+    const frame = document.createElement('iframe');
+    frame.style.inlineSize = `${width}px`;
+    frame.title = `${width}px wide frame`;
+    frame.addEventListener('load', () => {
+      results[index] = { width, ...measure(frame) };
+      loaded += 1;
+      if (loaded === widths.length) report();
+    });
+    frame.srcdoc = frameDocument;
+    frames.append(frame);
+  });
+
+  function report() {
+    for (const { width, test, reference } of results) {
+      const pass = test.every((value, i) => Number.isFinite(value) && Math.abs(value - reference[i]) < 0.05);
+      const row = rows.insertRow();
+      row.className = pass ? 'pass' : 'fail';
+      row.insertCell().textContent = `${width}px`;
+      row.insertCell().textContent = test.map((value) => `${value}px`).join(' / ');
+      row.insertCell().textContent = reference.map((value) => `${value}px`).join(' / ');
+      row.insertCell().textContent = pass ? 'PASS' : 'FAIL';
+    }
+    document.getElementById('supports').textContent =
+      `CSS.supports('opacity', 'progress(1, 0, 2)'): ${CSS.supports('opacity', 'progress(1, 0, 2)')}`;
+    document.getElementById('ua').textContent = navigator.userAgent;
+    document.documentElement.dataset.done = 'true';
+  }
+</script>
+</body>
+</html>

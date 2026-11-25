@@ -61,13 +61,17 @@ GitHub は frontmatter を YAML として読み、読めないときは表の代
 <!-- index:start -->
 | 件 | WebKit | Gecko | Blink | 更新 |
 |---|---|---|---|---|
-| [アンカーで配置した ::after のトランジションが、元の要素に :has() の規則が当たると始まらない](bugs/anchor-pseudo-transition-has-originating/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332060) | unsupported | not-affected | 2026-11-18 |
+| [アンカーで配置した ::after のトランジションが、元の要素に :has() の規則が当たると始まらない](bugs/anchor-pseudo-transition-has-originating/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332060) | unsupported | not-affected | 2026-11-25 |
+| [チェックボックスとラジオボタンの aspect-ratio が守られず、潰れる](bugs/checkbox-radio-aspect-ratio-collapses/) | drafted | not-affected | not-affected | 2026-11-25 |
 | [content-visibility を hidden へ transition させると、始めから中身が描画されない（::details-content の閉じるアニメーション）](bugs/details-content-visibility-transition-hides-early/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332674) | not-affected | not-affected | 2026-11-24 |
+| [段組みの2段目にある絶対配置の要素が、段に分ける前の位置に置かれて下にずれる](bugs/multicol-abspos-static-position-unfragmented/) | duplicate [1](https://bugs.webkit.org/show_bug.cgi?id=137506) | not-affected | not-affected | 2026-11-25 |
+| [progress() に長さを渡して未登録のカスタムプロパティに入れ、calc() で使えるか（対応状況の確認）](bugs/progress-function-length-custom-property/) | not-affected | not-affected | not-affected | 2026-11-25 |
 | [::-moz-range-thumb に指定した anchor-name で、アンカーにならない](bugs/range-thumb-anchor-name/) | not-affected | duplicate [1](https://bugzilla.mozilla.org/show_bug.cgi?id=1993699) | not-affected | 2026-11-24 |
 | [@scope の中で ::details-content に指定したスタイルが描画されない](bugs/scope-details-content-transition/) | not-affected | duplicate [1](https://bugzilla.mozilla.org/show_bug.cgi?id=2063991) | not-affected | 2026-11-24 |
 | [style 要素の @scope で、暗黙の範囲の起点の a に :any-link:hover が当たらない](bugs/scope-implicit-root-any-link-hover/) | cannot-reproduce | not-affected | not-affected | 2026-11-18 |
 | [縦書きで scrollIntoView() の block と inline が、横書きの向きとして扱われる](bugs/scroll-into-view-vertical-block-start/) | not-affected | fixed [1](https://bugzilla.mozilla.org/show_bug.cgi?id=1789464) [2](https://bugzilla.mozilla.org/show_bug.cgi?id=1699045) | not-affected | 2026-11-24 |
 | [和文の text-wrap: pretty が、balance のように各行を短く揃えて折り返す](bugs/text-wrap-pretty-cjk-balances/) | reported [1](https://bugs.webkit.org/show_bug.cgi?id=332074) | unsupported | not-affected | 2026-11-21 |
+| [startViewTransition() の types と :active-view-transition-type() が使えるか（対応状況の確認）](bugs/view-transition-types-support/) | not-affected | not-affected | not-affected | 2026-11-25 |
 <!-- index:end -->
 
 ## ライセンス
