@@ -2,7 +2,7 @@
 title: アンカーで配置した ::after のトランジションが、元の要素に :has() の規則が当たると始まらない
 slug: anchor-pseudo-transition-has-originating
 created: 2026-11-18
-updated: 2026-11-18
+updated: 2026-11-25
 features: CSS Anchor Positioning, anchor(), CSS Transitions, :has(), ::after
 status.webkit: reported
 status.gecko: unsupported
@@ -87,6 +87,14 @@ H1〜H5 は、座標を指定したホバーでポインターを動かし、ペ
 
 Safari Technology Preview の MCP サーバでは、操作するウィンドウの `document.visibilityState` が `hidden` のままで、描画のフレームが進まなかった。テストケースのスクリプトがフレームを待つところで止まるので、結果を取れていない。
 
+### 再確認（2026-11-25）
+
+OS: macOS 27.2.1。確認日: 2026-11-25。[WebKit Bug 332060](https://bugs.webkit.org/show_bug.cgi?id=332060) は NEW のままで、2026-11-18 から変更がない（`node scripts/bug-status.mjs`）。Safari と Safari Technology Preview のビルドは、上の再検証と同じ。
+
+| ブラウザ | バージョン | 変えた設定 | 結果 |
+|---|---|---|---|
+| Safari | 27.2 (22625.2.8.11.9) | なし | 失敗。Safari の MCP サーバで公開URLを開いた。グループ2だけ `left 0px -> 192px, running transitions of left: 0`。グループ1、3、4、5は `running transitions of left: 1`。H1〜H5 のホバーは確かめていない |
+
 ## web-platform-tests
 
 確認日: 2026-11-18。wpt.fyi の master の実行（Chrome 160.0.8166.0、Firefox 162.0a1、Safari Technology Preview 256。いずれも 2026-11-16）。
@@ -165,3 +173,4 @@ Blink は期待どおりに動いたので、トラッカーは検索してい�
 - WebKit: `reported`。2026-11-18 に [WebKit Bug 332060](https://bugs.webkit.org/show_bug.cgi?id=332060) として報告した。macOS 27.2.1 の Safari 27.2 と Safari Technology Preview 27.0 (22627.1.6.3) でも、グループ2と H2 は同じく失敗する（2026-11-18 に再検証）。Safari 26.5 と Safari Technology Preview 27.0 で、`anchor()` で配置した `::after` の元の要素に `:has()` の規則が当たっていると、アンカーが変わっても `left` のトランジションが始まらない。`:has()` の中身は `:hover`（H2）でもクラス（グループ2）でもよく、宣言の値が変わらなくても起きる。本物の子要素を配置する（グループ4、H5）か、アンカーを使わない（グループ5）と起きない。`:has()` を親に書く（グループ3、H4）か、元の要素に `:hover` を書く（H3）と、リストの中でリンクを移るときは起きない。ただし、ポインターがリストに出入りするときは H3 と H4 でも起きる（再検証の節を参照）。2026-11-18 に、この H3 と H4 の結果を 332060 にコメントで追記した。仕様は §3.2 で、`anchor()` が計算値の時点で解決されるのでトランジションが始まると決めている。同じ条件の既存の報告は見つからなかった。近い件の [314641](https://bugs.webkit.org/show_bug.cgi?id=314641) は、報告文で関連として示す。
 - Gecko: `unsupported`。Firefox 160.0.1 と Nightly 162.0a1 は、`:has()` の有無によらず `anchor()` の値がトランジションしない（グループ1も失敗する）。`anchor()` の値のトランジションが未実装で、[Bug 1924226](https://bugzilla.mozilla.org/show_bug.cgi?id=1924226) が扱っている。今回の条件に固有の問題があるかは、1924226 が直るまで確かめられない。
 - Blink: `not-affected`。Chrome 157 と Canary 160 は、すべてのグループでトランジションが始まる。
+- 2026-11-25 の再確認: 332060 は NEW のまま。Safari 27.2 (22625.2.8.11.9) で、グループ2はいまも失敗する。

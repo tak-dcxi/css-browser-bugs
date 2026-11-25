@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>view-transition-types-support</title>
+<!--
+  Testcase for view-transition-types-support. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid;
+    text-align: start;
+  }
+
+  .pass {
+    background: #cfc;
+    color: #000;
+  }
+
+  .fail {
+    background: #fcc;
+    color: #000;
+  }
+
+  /* Testcase styles */
+  @keyframes --marker {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+      clip-path: inset(0);
+    }
+  }
+
+  /* Flat selector. */
+  :active-view-transition-type(--test-type)::view-transition-new(root) {
+    animation-name: --marker;
+    animation-duration: 3s;
+  }
+
+  /* Nested selector, as authors often write it. */
+  :active-view-transition-type(--test-type) {
+    &::view-transition-old(root) {
+      animation-name: none;
+    }
+  }
+
+  #target {
+    inline-size: 12rem;
+    padding: 1rem;
+    background: #06c;
+    color: #fff;
+  }
+
+  #target.changed {
+    background: #c60;
+  }
+</style>
+</head>
+<body>
+<h1>view-transition-types-support</h1>
+
+<p>
+  Press the button. Pass if the box changes colour with a wipe from top to bottom over 3 seconds
+  (the animation given to <code>:active-view-transition-type(--test-type)</code>) and every row says PASS.
+  Fail if the colour cross-fades quickly or changes at once.
+</p>
+
+<p><button id="run" type="button">Start a view transition with types</button></p>
+<div id="target">Box</div>
+
+<table>
+  <thead>
+    <tr><th>Check</th><th>Value</th><th>Result</th></tr>
+  </thead>
+  <tbody id="rows"></tbody>
+</table>
+
+<p id="ua"></p>
+
+<script>
+  const rows = document.getElementById('rows');
+  const add = (name, value, pass) => {
+    const row = rows.insertRow();
+    row.insertCell().textContent = name;
+    row.insertCell().textContent = String(value);
+    const result = row.insertCell();
+    if (pass === undefined) return;
+    result.textContent = pass ? 'PASS' : 'FAIL';
+    result.className = pass ? 'pass' : 'fail';
+  };
+  const attempt = (callback) => {
+    try {
+      return callback();
+    } catch (error) {
+      return `threw ${error.name}: ${error.message}`;
+    }
+  };
+
+  const selector = ':active-view-transition-type(--test-type)';
+
+  async function run() {
+    rows.replaceChildren();
+    const hasApi = typeof document.startViewTransition === 'function';
+    add('typeof document.startViewTransition', typeof document.startViewTransition, hasApi);
+    const hasTypes = typeof ViewTransition !== 'undefined' && 'types' in ViewTransition.prototype;
+    add("'types' in ViewTransition.prototype", hasTypes, hasTypes);
+    const selectorSupported = CSS.supports(`selector(${selector})`);
+    add(`CSS.supports('selector(${selector})')`, selectorSupported, selectorSupported);
+    add('document.visibilityState', document.visibilityState);
+    if (!hasApi) return finish();
+
+    const target = document.getElementById('target');
+    let updateCalled = false;
+    let transition;
+    const started = attempt(() => {
+      transition = document.startViewTransition({
+        update: () => {
+          updateCalled = true;
+          target.classList.toggle('changed');
+        },
+        types: ['--test-type'],
+      });
+      return 'returned';
+    });
+    add('startViewTransition({ update, types })', started, started === 'returned');
+    if (!transition) return finish();
+
+    const types = attempt(() => (transition.types ? [...transition.types].join(', ') : String(transition.types)));
+    add('[...transition.types]', types, types === '--test-type');
+
+    const ready = await transition.ready.then(
+      () => 'fulfilled',
+      (error) => `rejected ${error.name}: ${error.message}`,
+    );
+    add('transition.ready', ready, ready === 'fulfilled');
+    add('update callback called', updateCalled, updateCalled);
+
+    const matches = attempt(() => document.documentElement.matches(selector));
+    add(`documentElement.matches('${selector}') while active`, matches, matches === true);
+    const newName = attempt(() => getComputedStyle(document.documentElement, '::view-transition-new(root)').animationName);
+    add('animation-name of ::view-transition-new(root)', newName, newName === '--marker');
+    const oldName = attempt(() => getComputedStyle(document.documentElement, '::view-transition-old(root)').animationName);
+    add('animation-name of ::view-transition-old(root) (nested rule)', oldName, oldName === 'none');
+    const running = attempt(() =>
+      document.getAnimations().map((animation) => `${animation.effect?.pseudoElement} ${animation.animationName}`).join('; '),
+    );
+    add('document.getAnimations()', running);
+
+    // Do not wait 3 seconds for the result.
+    transition.skipTransition();
+    const finished = await transition.finished.then(
+      () => 'fulfilled',
+      (error) => `rejected ${error.name}: ${error.message}`,
+    );
+    add('transition.finished', finished);
+    const after = attempt(() => document.documentElement.matches(selector));
+    add(`documentElement.matches('${selector}') after it finished`, after, after === false);
+    finish();
+  }
+
+  function finish() {
+    document.getElementById('ua').textContent = navigator.userAgent;
+    document.documentElement.dataset.done = 'true';
+  }
+
+  document.getElementById('run').addEventListener('click', run);
+  if (new URLSearchParams(location.search).has('auto')) run();
+</script>
+</body>
+</html>
