@@ -4,7 +4,7 @@ slug: checkbox-radio-aspect-ratio-collapses
 created: 2026-11-25
 updated: 2026-11-25
 features: CSS Box Sizing Level 4, aspect-ratio, input type=checkbox, input type=radio, appearance
-status.webkit: investigating
+status.webkit: drafted
 status.gecko: not-affected
 status.blink: not-affected
 links.webkit:
@@ -26,16 +26,25 @@ links.spec: https://drafts.csswg.org/css-sizing-4/#aspect-ratio
 - `appearance: none` にすると、`aspect-ratio` どおり 36 × 36 になる。
 - 幅と高さの両方を書けば、`appearance: auto` でも 36 × 36 になる。
 
+テストケースの外でも、Safari 27.2 で `margin: 0` のチェックボックスとラジオボタンに次の宣言を書いて測った（2026-11-25）。
+
+- `width: 36px; aspect-ratio: 2 / 1` は 36 × 12 になる（期待は 36 × 18）。
+- `height: 36px; aspect-ratio: 1` は 12 × 36 になる（期待は 36 × 36）。高さだけを書いたときは、幅が 12px のままになる。
+- `<button>` と `<input type="range">` に `width: 100px; aspect-ratio: 1` を書くと 100 × 100 になる。ネイティブの見た目のままでもこの 2 つでは `aspect-ratio` が使われる。
+
 ## 期待する挙動と根拠
 
-この挙動は仕様が決めていると読める。根拠は次の 2 つの節（どちらも Editor’s Draft、2026-11-25 に読んだ）。
+この挙動は仕様が決めていると読める。根拠は次の 3 つの節（css-sizing-4 と css-ui-4 は Editor’s Draft、HTML は Living Standard。2026-11-25 に読んだ）。
 
 - [CSS Box Sizing Module Level 4 §4.1 Preferred Aspect Ratios: the aspect-ratio property](https://drafts.csswg.org/css-sizing-4/#aspect-ratio): `aspect-ratio` は、インラインボックスと内部のルビ・表のボックスを除くすべての要素に適用され、自動の大きさの計算に使われる。値が `<ratio>` だけのときは、置換要素でも、書いた比率が望ましい比率になる。
 - [CSS Basic User Interface Module Level 4 §7.2 Switching appearance: the appearance property](https://drafts.csswg.org/css-ui-4/#appearance-switching): `appearance: auto` の要素のボックスは、ふつうの置換要素と同じようにレイアウトされ、そのボックスの中にネイティブの見た目が描かれる。
+- [HTML §15.5.10 The input element as checkbox, switch, and radio button widgets](https://html.spec.whatwg.org/multipage/rendering.html#the-input-element-as-a-checkbox-and-radio-button-widgets): チェックボックスとラジオボタンは、コントロールを 1 つ含む `inline-block` のボックスとして描かれる。大きさを固定する記述はない。
 
 チェックボックスとラジオボタンの `block-size` を書いていなければ自動なので、`inline-size: 36px; aspect-ratio: 1` の高さは 36px になる。Firefox と Chrome はそうなる。
 
-Safari で `block-size` の計算値が `12px` になるのは、ネイティブの見た目のコントロールで、書かれていない側の大きさをエンジンが既定の大きさで埋めているためと考えられる（エンジンのコードは読んでいない）。css-ui-4 には、ネイティブの見た目のコントロールの大きさを UA が決めてよいという記述は、読んだ範囲（§7.2 の値の定義）では見つからなかった。§7.2.2 と §7.3 は読んでいない。csswg-drafts の Issue の検索は、実行する権限がなく、していない。
+flex で引き伸ばされる行（`align-items: normal`）の期待値は、Firefox と Chrome の結果に合わせている。[CSS Box Alignment Module Level 3 §6.2.4](https://drafts.csswg.org/css-align-3/#align-flex) は、flex の子の `align-self: normal` が `stretch` として振る舞うと定めている。引き伸ばした高さと `aspect-ratio` の組み合わせを flex のレイアウトの手順からどう導くかは、確かめていない。
+
+Safari で `block-size` の計算値が `12px` になるのは、ネイティブの見た目のコントロールで、書かれていない側の大きさをエンジンが既定の大きさで埋めているためと考えられる（エンジンのコードは読んでいない）。css-ui-4 §7.2 は、ネイティブの見た目のコントロールにも、ボックスの大きさと位置に関わるプロパティ（大きさのプロパティなど）を適用しなければならないと定めている。UA が無視してよいのは、コントロールの中身の大きさと描画に関わるプロパティ（`box-sizing`、`padding`、`border`、`margin` など）の側になる。§7.2.1〜§7.2.3 と §7.3 にも、ボックスの大きさを UA が決めてよいという記述は見つからなかった。§7.3 には `appearance: auto` でもネイティブの見た目を失わせるプロパティを文書にしたほうがよいという編集上の注記があるが、大きさの求め方には触れていない。csswg-drafts の Issue の検索は、実行する権限がなく、していない。
 
 ## 再現
 
@@ -54,7 +63,7 @@ OS: macOS 27.2.1。確認日: 2026-11-25。
 |---|---|---|---|
 | Safari | 27.2 (22625.2.8.11.9) | なし | 失敗。`appearance: auto` の 10 行がすべて 36 × 12（`block-size` の計算値 12px）。`appearance: none` の 10 行は合格 |
 | Safari Technology Preview | 27.0 (22627.1.6.3) | なし | 失敗。Safari 27.2 と同じ 10 行 |
-| Firefox | 160.0.1 | なし | 合格。20 行すべて（正方形の行は 36 × 36、引き伸ばしの行は 36 × 51.2） |
+| Firefox | 160.0.1 | なし | 合格。20 行すべて（正方形の行と 1 行のラベルの引き伸ばしの行は 36 × 36、2 行のラベルの引き伸ばしの行は 36 × 51.2） |
 | Google Chrome | 157.0.8103.80 | なし | 合格。20 行すべて |
 
 ## web-platform-tests
@@ -88,6 +97,6 @@ Gecko と Blink は期待どおりに動いたので、トラッカーは検索�
 
 ## 結論
 
-- WebKit: `investigating`。Safari 27.2 と Safari Technology Preview 27.0 で、`appearance: auto` のチェックボックスとラジオボタンは、幅だけを書いても `aspect-ratio` で高さが決まらず、12px のままになる。同じ条件の既存の報告は、上の検索では見つからなかった。仕様（css-sizing-4 §4.1 と css-ui-4 §7.2）に照らすと、高さは幅と比率から決まるはずで、Safari の挙動は仕様と合わない。まだしていないこと: 目で見る判定、css-ui-4 の §7.2.2 と §7.3 の確認、報告文の下書き。
+- WebKit: `drafted`。報告文の下書きは [report.webkit.en.md](report.webkit.en.md)。Safari 27.2 と Safari Technology Preview 27.0 で、`appearance: auto` のチェックボックスとラジオボタンは、幅だけを書いても `aspect-ratio` で高さが決まらず、12px のままになる。同じ条件の既存の報告は、上の検索では見つからなかった。仕様（css-sizing-4 §4.1、css-ui-4 §7.2、HTML §15.5.10）に照らすと、高さは幅と比率から決まるはずで、Safari の挙動は仕様と合わない。目で見る判定はまだしていない。
 - Gecko: `not-affected`。Firefox 160.0.1 は 20 行すべて合格。
 - Blink: `not-affected`。Chrome 157 は 20 行すべて合格。

@@ -85,7 +85,8 @@
   Each row has a test control (<code>inline-size: 36px; aspect-ratio: 1</code>) and a reference control
   (<code>inline-size: 36px; block-size: 36px</code>). In the rows marked "square expected", pass if the
   test control is a 36px square like the reference. In the stretched flex rows the control is expected to
-  be as tall as the two-line label, because a flex item with an automatic block size is stretched.
+  be as tall as the flex line (36px with the one-line label, the height of the label with the two-line
+  label), because a flex item with an automatic block size is stretched.
 </p>
 
 <table>
