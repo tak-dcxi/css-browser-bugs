@@ -108,4 +108,12 @@ Version は年ごとに増え、古い値は無効になる。前回の報告の
 - それ以外の文は下書きのまま使い、言い換えない。下書きを直したいときは、先にファイルを直してコミットする。
 - 公開 URL が開けないときは、Steps to reproduce の「(also available at …)」を外す。
 
-Chromium Issue Tracker で本文の書式がどう表示されるかは確かめていない。初めて報告するときにフォームのプレビューで確かめ、結果をこの節に書き足す。
+### Chromium Issue Tracker の新規作成
+
+2026-11-27 に初めて報告したときの記録。
+
+- 新規作成のページ（https://issues.chromium.org/issues/new ）はウィザードで、サインインが要る。1段目で役割（Web Developer）と種類（API など）を選び、既存の件を検索したことを認めるチェックを入れる。
+- 2段目は OS、Channel、Chrome version、題、手順の欄、問題の説明の欄。題は100字まで、手順の欄と問題の説明の欄は1つ5000字まで。Chrome version には組み込みブラウザ自身のバージョンが最初から入っているので、確かめたバージョンに直す。手順の欄には「1. 2. 3.」の雛形が入っているので、消してから貼る。
+- 3段目は Component、ほかのブラウザで正しく動くかの問い、追加のコメント、添付、reCAPTCHA。Component の選択肢に Blink>HTML>Focus はなく、Blink>HTML を選んだ件の Component は Blink になった。添付と reCAPTCHA と送信はユーザーが行う。
+- プレビューはない。送った件の本文では Markdown の見出し、番号付きと番号なしの箇条書き、インラインのコードが書式として表示された。そのため、Bugzilla と違い、Markdown を外さずに貼ってよい。
+- ウィザードは本文の前後に「Steps to reproduce the problem」「Problem Description」「Summary」「Custom Questions」「Additional Data」の見出しを足す。

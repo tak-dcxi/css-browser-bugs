@@ -6,10 +6,10 @@ updated: 2026-11-27
 features: reading-flow, popover
 status.webkit: unsupported
 status.gecko: unsupported
-status.blink: drafted
+status.blink: reported
 links.webkit:
 links.gecko:
-links.blink:
+links.blink: https://issues.chromium.org/issues/590893467
 links.spec: https://html.spec.whatwg.org/multipage/interaction.html#flattened-tabindex-ordered-focus-navigation-scope
 ---
 
@@ -66,11 +66,11 @@ reading flow と focus navigation の関係を HTML に書き込む PR は、[wh
 
 OS: macOS 27.2.1。確認日: 2026-11-27。
 
-Chromium の結果は、Playwright 1.65.1 でキーを押して確かめた。テストの「Start here」にフォーカスし、Tab、Enter、Tab を4回、Shift+Tab を4回の順に押して、テストケースの表示を読んだ。3つともヘッドレスで動かした。Google Chrome と Google Chrome Canary は、Playwright の `chrome` と `chrome-canary` のチャンネルで、入っているアプリを動かした。手で操作しての確認はしていない。
+Chromium の結果は、Playwright 1.65.1 でキーを押して確かめた。テストの「Start here」にフォーカスし、Tab、Enter、Tab を4回、Shift+Tab を4回の順に押して、テストケースの表示を読んだ。3つともヘッドレスで動かした。Google Chrome と Google Chrome Canary は、Playwright の `chrome` と `chrome-canary` のチャンネルで、入っているアプリを動かした。そのあと Google Chrome 158.0.8127.88 で、テストケースの手順どおりに手で操作し、同じ結果になることを確かめた。
 
 | ブラウザ | バージョン | 変えた設定 | 確かめた手段 | 結果 |
 |---|---|---|---|---|
-| Google Chrome | 158.0.8127.88 | なし | Playwright（`chrome` チャンネル） | 失敗。Tab で start > button1 > inner > close > **button2** > next、続く Shift+Tab で button2 > close > inner > **after**。参照は合格 |
+| Google Chrome | 158.0.8127.88 | なし | Playwright（`chrome` チャンネル）、手での操作 | 失敗。Tab で start > button1 > inner > close > **button2** > next、続く Shift+Tab で button2 > close > inner > **after**。参照は合格 |
 | Google Chrome Canary | 160.0.8186.0 | なし | Playwright（`chrome-canary` チャンネル） | 失敗。Chrome 158 と同じ |
 | Chromium（Playwright に同梱） | 159.0.8154.6 | なし | Playwright | 失敗。Chrome 158 と同じ |
 | Safari | 27.2 (22625.2.8.11.9) | なし | Safari の MCP サーバ | `reading-flow` に未対応（`CSS.supports('reading-flow', 'flex-visual')` が false） |
@@ -158,6 +158,7 @@ Gecko と WebKit は `reading-flow` に未対応なので、トラッカーは�
 
 ## 結論
 
-- Blink: `drafted`。Chrome 158、Chromium 159、Canary 160 で再現する。popover が reading flow item の中にあると、popover の中から Tab で出たときに popover の要素の DOM の位置の次へ進み、開いたボタンと popover のあいだの要素を飛ばす。Shift+Tab では popover の中と飛ばした要素のあいだを回り続け、開いたボタンへ戻れない。HTML Standard の規則では、popover の中身は開いたボタンの直後に入る。未マージの whatwg/html#10613 の文でも、表示中の popover は reading flow item の scope に入らない。既存の報告は見つからなかったので、報告文を下書きした（[report.blink.en.md](report.blink.en.md)）。
+- Blink: `reported`。Chrome 158、Chromium 159、Canary 160 で再現する。popover が reading flow item の中にあると、popover の中から Tab で出たときに popover の要素の DOM の位置の次へ進み、開いたボタンと popover のあいだの要素を飛ばす。Shift+Tab では popover の中と飛ばした要素のあいだを回り続け、開いたボタンへ戻れない。HTML Standard の規則では、popover の中身は開いたボタンの直後に入る。未マージの whatwg/html#10613 の文でも、表示中の popover は reading flow item の scope に入らない。既存の報告は見つからなかったので、報告文を下書きした（[report.blink.en.md](report.blink.en.md)）。
+  2026-11-27 に [Chromium Issue 590893467](https://issues.chromium.org/issues/590893467) として報告した。新規作成のウィザードは題を100字まで、本文の欄を1つ5000字までに限るので、題を短くし、本文を手順の欄と問題の説明の欄に分けて送った（[report.blink.en.md](report.blink.en.md) の冒頭のコメント）。Component には Blink>HTML を選んだが、送った件の Component は Blink になった。
 - Gecko: `unsupported`。Firefox 161.0 と、Playwright に同梱の Firefox 159.0 は `reading-flow` に未対応。
 - WebKit: `unsupported`。Safari 27.2、Safari Technology Preview 27.0、Playwright に同梱の WebKit 27.2 は `reading-flow` に未対応。

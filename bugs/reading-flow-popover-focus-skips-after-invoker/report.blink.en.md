@@ -4,11 +4,13 @@
   New bug form: https://issues.chromium.org/issues/new
   Product / Component: Blink>HTML>Focus (the component of the related reading-flow and popover focus bugs 335909581 and 436071736)
   Fields to set (version, hardware, keywords): Type: Bug; OS: Mac; Found In: 158.0.8127.88, 160.0.8186.0
+  New issue wizard: role Web Developer, category API; Operating System: Mac OS; Channel: Stable; Chrome version: 158.0.8127.88; Did this work before: Not applicable
+  The wizard limits the summary to 100 characters and each text field to 5000 characters: put "Steps to reproduce" and "Environment" in the steps field, and the other sections in the problem description field.
   See Also: https://issues.chromium.org/issues/335909581
   Attach: repro.html
 -->
 
-# reading-flow: Tab out of a popover nested in a reading flow item skips the elements between the popover trigger and the popover, and Shift+Tab never returns to the trigger
+# reading-flow: Tab out of a popover in a reading flow item skips content after the popover trigger
 
 ## Steps to reproduce
 
@@ -55,7 +57,7 @@ Issue 335909581 (popover that is itself a reading flow container) was fixed by u
 - Chrome Canary 160.0.8186.0, macOS 27.2.1
 - Chromium 159.0.8154.6 (bundled with Playwright 1.65.1), macOS 27.2.1
 
-No settings changed. Results were taken with Playwright in headless mode by focusing the "Start here" link and pressing the keys (Chrome and Chrome Canary through the `chrome` and `chrome-canary` channels). Not verified by hand.
+No settings changed. Results were taken with Playwright in headless mode by focusing the "Start here" link and pressing the keys (Chrome and Chrome Canary through the `chrome` and `chrome-canary` channels). The same results were then reproduced by hand in Chrome 158.0.8127.88, following the steps above.
 
 The bug depends on where the popover element is. The following variations are not in the attached testcase; they were checked in Chromium 159.0.8154.6 only, with the popover opened by `popovertarget` unless noted:
 
