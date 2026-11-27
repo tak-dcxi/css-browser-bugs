@@ -67,6 +67,7 @@ GitHub は frontmatter を YAML として読み、読めないときは表の代
 | [段組みの2段目にある絶対配置の要素が、段に分ける前の位置に置かれて下にずれる](bugs/multicol-abspos-static-position-unfragmented/) | duplicate [1](https://bugs.webkit.org/show_bug.cgi?id=137506) | not-affected | not-affected | 2026-11-25 |
 | [progress() に長さを渡して未登録のカスタムプロパティに入れ、calc() で使えるか（対応状況の確認）](bugs/progress-function-length-custom-property/) | not-affected | not-affected | not-affected | 2026-11-25 |
 | [::-moz-range-thumb に指定した anchor-name で、アンカーにならない](bugs/range-thumb-anchor-name/) | not-affected | duplicate [1](https://bugzilla.mozilla.org/show_bug.cgi?id=1993699) | not-affected | 2026-11-24 |
+| [reading-flow の中の popover から Tab で出ると、開いたボタンの後ろの要素を飛ばす](bugs/reading-flow-popover-focus-skips-after-invoker/) | unsupported | unsupported | drafted | 2026-11-27 |
 | [@scope の中で ::details-content に指定したスタイルが描画されない](bugs/scope-details-content-transition/) | not-affected | duplicate [1](https://bugzilla.mozilla.org/show_bug.cgi?id=2063991) | not-affected | 2026-11-24 |
 | [style 要素の @scope で、暗黙の範囲の起点の a に :any-link:hover が当たらない](bugs/scope-implicit-root-any-link-hover/) | cannot-reproduce | not-affected | not-affected | 2026-11-18 |
 | [縦書きで scrollIntoView() の block と inline が、横書きの向きとして扱われる](bugs/scroll-into-view-vertical-block-start/) | not-affected | fixed [1](https://bugzilla.mozilla.org/show_bug.cgi?id=1789464) [2](https://bugzilla.mozilla.org/show_bug.cgi?id=1699045) | not-affected | 2026-11-24 |

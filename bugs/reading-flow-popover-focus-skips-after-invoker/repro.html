@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reading-flow-popover-focus-skips-after-invoker</title>
+<!--
+  Testcase for reading-flow-popover-focus-skips-after-invoker. Released under CC0 1.0.
+  Self-contained: no external resources.
+-->
+<style>
+  body {
+    margin: 1rem;
+    font: 16px/1.6 system-ui, sans-serif;
+  }
+
+  .case {
+    margin-block: 1.5rem;
+  }
+
+  .label {
+    margin: 0 0 0.25rem;
+    font-weight: bold;
+  }
+
+  .result {
+    margin: 0.25rem 0 0;
+    font-family: ui-monospace, monospace;
+  }
+
+  .pass {
+    background: #cfc;
+    color: #000;
+  }
+
+  .fail {
+    background: #fcc;
+    color: #000;
+  }
+
+  /* Testcase styles */
+  .flow {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The only difference between the test and the reference. No item has order, so the reading order equals the DOM order. */
+  .test .flow {
+    reading-flow: flex-visual;
+  }
+
+  [popover] {
+    inset: auto 1rem 1rem auto;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+<h1>reading-flow-popover-focus-skips-after-invoker</h1>
+
+<p>
+  In each case, focus the "1" button with the keyboard (for example, click the "Start here" link and press Tab;
+  in Safari, use Option+Tab instead of Tab) and press Enter to open the popover.
+  Then press Tab four times, and then Shift+Tab until the focus leaves the popover backwards.
+  The script under each case prints the focus order and two checks:
+</p>
+
+<ul>
+  <li>Tab from the "Close" button should move to the "link after the button" in the same paragraph.</li>
+  <li>Shift+Tab from the "inner link" (the first focusable element in the popover) should move to the "1" button.</li>
+</ul>
+
+<p>Pass if both checks pass in the test and in the reference.</p>
+
+<p id="support"></p>
+
+<section class="case test" data-case="test">
+  <p class="label">Test (<code>reading-flow: flex-visual</code> on the flex container)</p>
+  <div class="flow">
+    <div>
+      <p><a href="#" data-name="start">Start here</a></p>
+      <p>
+        Text<sup><button type="button" popovertarget="test-p1" data-name="button1">1</button></sup>
+        and the rest of the paragraph with a <a href="#" data-name="after">link after the button</a>.
+      </p>
+      <div id="test-p1" popover>
+        <p>Footnote 1 with an <a href="#" data-name="inner">inner link</a>.</p>
+        <button type="button" popovertarget="test-p1" popovertargetaction="hide" data-name="close">Close</button>
+      </div>
+      <p>Next<sup><button type="button" popovertarget="test-p2" data-name="button2">2</button></sup>.</p>
+      <div id="test-p2" popover><p>Footnote 2</p></div>
+      <p><a href="#" data-name="next">Link in the next paragraph</a></p>
+    </div>
+  </div>
+  <p class="result order"></p>
+  <p class="result forward"></p>
+  <p class="result backward"></p>
+</section>
+
+<section class="case reference" data-case="reference">
+  <p class="label">Reference (no <code>reading-flow</code>)</p>
+  <div class="flow">
+    <div>
+      <p><a href="#" data-name="start">Start here</a></p>
+      <p>
+        Text<sup><button type="button" popovertarget="reference-p1" data-name="button1">1</button></sup>
+        and the rest of the paragraph with a <a href="#" data-name="after">link after the button</a>.
+      </p>
+      <div id="reference-p1" popover>
+        <p>Footnote 1 with an <a href="#" data-name="inner">inner link</a>.</p>
+        <button type="button" popovertarget="reference-p1" popovertargetaction="hide" data-name="close">Close</button>
+      </div>
+      <p>Next<sup><button type="button" popovertarget="reference-p2" data-name="button2">2</button></sup>.</p>
+      <div id="reference-p2" popover><p>Footnote 2</p></div>
+      <p><a href="#" data-name="next">Link in the next paragraph</a></p>
+    </div>
+  </div>
+  <p class="result order"></p>
+  <p class="result forward"></p>
+  <p class="result backward"></p>
+</section>
+
+<script>
+  // The script only records the focus order. The focus is moved by the browser's own Tab handling.
+  document.getElementById('support').textContent =
+    `CSS.supports('reading-flow', 'flex-visual'): ${CSS.supports('reading-flow', 'flex-visual')}`;
+
+  let shiftTab = false;
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Tab') shiftTab = event.shiftKey;
+  }, true);
+
+  const show = (element, label, expected, actual) => {
+    const pass = actual === expected;
+    element.classList.toggle('pass', pass);
+    element.classList.toggle('fail', !pass);
+    element.textContent = `${label}: ${actual} (${pass ? 'PASS' : `FAIL, expected ${expected}`})`;
+  };
+
+  for (const section of document.querySelectorAll('.case')) {
+    const order = section.querySelector('.order');
+    let names = [];
+
+    section.addEventListener('focusin', (event) => {
+      const name = event.target.dataset.name;
+      if (!name) return;
+      if (name === 'start') names = [];
+      names.push(name);
+      order.textContent = `Focus order: ${names.join(' > ')}`;
+
+      const from = event.relatedTarget?.dataset.name;
+      if (from === 'close' && !shiftTab) {
+        show(section.querySelector('.forward'), 'Tab from "close"', 'after', name);
+      }
+      if (from === 'inner' && shiftTab) {
+        show(section.querySelector('.backward'), 'Shift+Tab from "inner"', 'button1', name);
+      }
+    });
+
+    for (const link of section.querySelectorAll('a')) {
+      link.addEventListener('click', (event) => event.preventDefault());
+    }
+  }
+</script>
+</body>
+</html>
