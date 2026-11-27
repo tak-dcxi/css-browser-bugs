@@ -46,7 +46,7 @@ HTML の規則は次のとおり（[HTML Standard §6.6.2](https://html.spec.wha
 - `flex-visual` は flex item の見た目の順に従うので、`order` がなければ DOM の順と同じになる。`source-order` は、`reading-order` の指定を除けば DOM の順に従う。
 - 線形の読み上げ、フォーカスの順、スクリーンリーダーの順は一致させるべきとしている。
 
-reading flow と focus navigation の関係を HTML に書き込む PR は、[whatwg/html#10613](https://github.com/whatwg/html/pull/10613) Add support for CSS reading-flow で、開いたまま（「do not merge yet」のラベル付き）である。Chromium の実装は、この PR の設計に沿っている（下の「検索の記録」の [335909581](https://issues.chromium.org/issues/335909581)）。PR のプレビュー（2025-03-28 の版、[whatpr.org](https://whatpr.org/html/10613/interaction.html)）では、reading flow container と、その子（reading flow item）が focus navigation scope owner になる。一方で associated focus navigation owner の手順では、popover の手順が reading flow の手順より前にあり、reading flow の手順は親だけを見る。そのため、この PR の文でも、表示中の popover は reading flow item の scope に入らず、trigger の側に属する。このプレビューの popover の手順は、trigger ではなく popover 自身を返す古い形で、今の HTML Standard とは違う。それでも popover が reading flow item の scope の外にある点は変わらない。
+reading flow と focus navigation の関係を HTML に書き込む PR は、[whatwg/html#10613](https://github.com/whatwg/html/pull/10613) Add support for CSS reading-flow で、開いたまま（「do not merge yet」のラベル付き）である。Chromium の開発者は `dialog` の中の reading flow のフォーカスの件（下の「検索の記録」の [436071736](https://issues.chromium.org/issues/436071736)）で、この PR を仕様として挙げている（comment 11）。PR のプレビュー（2025-03-28 の版、[whatpr.org](https://whatpr.org/html/10613/interaction.html)）では、reading flow container と、その子（reading flow item）が focus navigation scope owner になる。一方で associated focus navigation owner の手順では、popover の手順が reading flow の手順より前にあり、reading flow の手順は親だけを見る。そのため、この PR の文でも、表示中の popover は reading flow item の scope に入らない。ただし、このプレビューの popover の手順は trigger ではなく popover 自身を返す古い形で、今の HTML Standard とは違う。この古い形のもとで popover の中身が順のどこに入るかを定める部分は、読んでいない。
 
 関係する Issue:
 
@@ -152,7 +152,7 @@ GitHub の検索は、`gh search issues` が使えなかったので、GitHub �
 
 - [Chromium 335909581](https://issues.chromium.org/issues/335909581)（Fixed、Blink>HTML>Focus）: popover そのものが reading flow container のとき、scope owner を popover と trigger のどちらにするかの件。popover の scope は、owner が trigger なので、出るときは trigger の次へ進む、と本文で説明している。2025-06-19 に「popover trigger を scope owner にする」実装で直したとして閉じた。今回の件は、popover が reading flow container ではなく reading flow item の中にあるときなので、条件が違う。
 - [Chromium 436071736](https://issues.chromium.org/issues/436071736)（New、Blink>HTML>Focus）: `dialog` の中の reading flow で、最初にフォーカスする要素が見た目の順の先頭にならない件。仕様の問題として、whatwg/html#10613 にコメントが付いている。popover の Tab の順は扱っていない。
-- [Chromium 371024057](https://issues.chromium.org/issues/371024057)（Fixed）: reading flow に加わらない要素（`display: contents`、絶対配置、固定配置）の順の件。題と一覧だけを見た。
+- [Chromium 371024057](https://issues.chromium.org/issues/371024057)（Fixed、Blink>HTML>Focus）: reading flow に加わらない要素（`display: contents`、絶対配置、固定配置）の順の件。表示中の popover は UA のスタイルで固定配置になるので、中身を読んだ。本文が挙げる決議（[w3c/csswg-drafts#9230](https://github.com/w3c/csswg-drafts/issues/9230)）が扱うのは `display: contents` の要素の順だけで、reading flow item の中にある固定配置の子孫をどこに置くかは書いていない。
 
 Gecko と WebKit は `reading-flow` に未対応なので、トラッカーは検索していない。
 
