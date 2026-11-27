@@ -66,11 +66,11 @@ reading flow と focus navigation の関係を HTML に書き込む PR は、[wh
 
 OS: macOS 27.2.1。確認日: 2026-11-27。
 
-Chromium の結果は、Playwright 1.65.1 でキーを押して確かめた。テストの「Start here」にフォーカスし、Tab、Enter、Tab を4回、Shift+Tab を4回の順に押して、テストケースの表示を読んだ。3つともヘッドレスで動かした。Google Chrome と Google Chrome Canary は、Playwright の `chrome` と `chrome-canary` のチャンネルで、入っているアプリを動かした。手で操作しての確認はしていない。
+Chromium の結果は、Playwright 1.65.1 でキーを押して確かめた。テストの「Start here」にフォーカスし、Tab、Enter、Tab を4回、Shift+Tab を4回の順に押して、テストケースの表示を読んだ。3つともヘッドレスで動かした。Google Chrome と Google Chrome Canary は、Playwright の `chrome` と `chrome-canary` のチャンネルで、入っているアプリを動かした。そのあと Google Chrome 158.0.8127.88 で、テストケースの手順どおりに手で操作し、同じ結果になることを確かめた。
 
 | ブラウザ | バージョン | 変えた設定 | 確かめた手段 | 結果 |
 |---|---|---|---|---|
-| Google Chrome | 158.0.8127.88 | なし | Playwright（`chrome` チャンネル） | 失敗。Tab で start > button1 > inner > close > **button2** > next、続く Shift+Tab で button2 > close > inner > **after**。参照は合格 |
+| Google Chrome | 158.0.8127.88 | なし | Playwright（`chrome` チャンネル）、手での操作 | 失敗。Tab で start > button1 > inner > close > **button2** > next、続く Shift+Tab で button2 > close > inner > **after**。参照は合格 |
 | Google Chrome Canary | 160.0.8186.0 | なし | Playwright（`chrome-canary` チャンネル） | 失敗。Chrome 158 と同じ |
 | Chromium（Playwright に同梱） | 159.0.8154.6 | なし | Playwright | 失敗。Chrome 158 と同じ |
 | Safari | 27.2 (22625.2.8.11.9) | なし | Safari の MCP サーバ | `reading-flow` に未対応（`CSS.supports('reading-flow', 'flex-visual')` が false） |
